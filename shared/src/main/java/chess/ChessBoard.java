@@ -69,42 +69,6 @@ public class ChessBoard {
         squares[7][3] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
         this.board = squares;
     }
-//    public void displayBoard() {
-//        for (int r = 8; r > 0; r--) {
-//            System.out.print("[");
-//            for (int c = 1; c < 9; c++) {
-//                ChessPiece piece = getPiece(new ChessPosition(r, c));
-//                if (piece == null) {
-//                    System.out.print(" X ");
-//                } else {
-//                    if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-//                        System.out.print(piece.toString());
-//                    } else {
-//                        System.out.print(piece.toString().toLowerCase());
-//                    }
-//                }
-//                System.out.print(",");
-//            }
-//            System.out.println("]\n");
-//        }
-//
-//    for (ChessPiece[] row : squares) {
-//        System.out.print("[");
-//        for (ChessPiece piece : row) {
-//            if (piece == null) {
-//                System.out.print("null");
-//            } else {
-//                if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-//                    System.out.print(piece.toString());
-//                } else {
-//                    System.out.print(piece.toString().toLowerCase());
-//                }
-//            }
-//            System.out.print(",");
-//            }
-//        System.out.println("]\n");
-//        }
-//    }
 
     @Override
     public boolean equals(Object o) {
