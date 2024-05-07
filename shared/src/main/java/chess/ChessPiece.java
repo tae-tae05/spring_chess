@@ -62,6 +62,11 @@ public class ChessPiece {
                 BishopMoves bishop = new BishopMoves();
                 moves = bishop.pieceMoves(board, myPosition, color);
             }
+            case ChessPiece.PieceType.KING ->
+            {
+                KingMoves king = new KingMoves();
+                moves = king.pieceMoves(board, myPosition, color);
+            }
             default ->
             {
                 return null;
