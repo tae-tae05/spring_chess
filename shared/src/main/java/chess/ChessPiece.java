@@ -58,24 +58,34 @@ public class ChessPiece {
         int col = myPosition.getColumn();
         Collection<ChessMove> moves = new ArrayList<>();
         switch (piece) {
-            case ChessPiece.PieceType.BISHOP -> {
+            case PieceType.BISHOP -> {
                 BishopMoves bishop = new BishopMoves();
                 moves = bishop.pieceMoves(board, myPosition, color);
             }
-            case ChessPiece.PieceType.KING ->
+            case PieceType.KING ->
             {
                 KingMoves king = new KingMoves();
                 moves = king.pieceMoves(board, myPosition, color);
             }
-            case ChessPiece.PieceType.KNIGHT ->
+            case PieceType.KNIGHT ->
             {
                 KnightMoves knight = new KnightMoves();
                 moves = knight.pieceMoves(board, myPosition, color);
             }
-            case ChessPiece.PieceType.PAWN ->
+            case PieceType.PAWN ->
             {
                 PawnMoves pawn = new PawnMoves();
                 moves = pawn.pieceMoves(board, myPosition, color);
+            }
+            case PieceType.QUEEN ->
+            {
+                QueenMoves queen = new QueenMoves();
+                moves = queen.pieceMoves(board, myPosition, color);
+            }
+            case PieceType.ROOK ->
+            {
+                RookMoves rook = new RookMoves();
+                moves = rook.pieceMoves(board, myPosition, color);
             }
             default ->
             {
