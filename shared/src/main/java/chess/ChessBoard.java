@@ -9,7 +9,7 @@ import java.util.Arrays;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] squares = new ChessPiece[8][8];
+    private ChessPiece[][] board = new ChessPiece[8][8];
     public ChessBoard() {
     }
 
@@ -20,7 +20,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()-1][position.getColumn()-1] = piece;
+        board[position.getRow()-1][position.getColumn()-1] = piece;
     }
     /**
      * Gets a chess piece on the chessboard
@@ -31,10 +31,10 @@ public class ChessBoard {
      */
 
     public void removePiece(ChessPosition position){
-        squares[position.getRow()-1][position.getColumn()-1] = null;
+        board[position.getRow()-1][position.getColumn()-1] = null;
     }
     public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow()-1][position.getColumn()-1];
+        return board[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
@@ -42,7 +42,7 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        squares = new ChessPiece[8][8];
+        ChessPiece[][] squares = new ChessPiece[8][8];
         for(int i = 0; i < 8; i++){
             ChessPiece pawn = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
             squares[1][i] = pawn;
@@ -67,7 +67,7 @@ public class ChessBoard {
         squares[0][3] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
         squares[7][4] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
         squares[7][3] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
-
+        this.board = squares;
     }
 //    public void displayBoard() {
 //        for (int r = 8; r > 0; r--) {
@@ -111,12 +111,12 @@ public class ChessBoard {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessBoard that = (ChessBoard) o;
-        return Arrays.deepEquals(squares, that.squares);
+        return Arrays.deepEquals(board, that.board);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(squares);
+        return Arrays.deepHashCode(board);
     }
 }
 
