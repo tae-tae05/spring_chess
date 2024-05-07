@@ -9,7 +9,78 @@ public class BishopMoves implements MovesCalculator{
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
         Collection<ChessMove> moves = new ArrayList<>();
-        
+        for(int i = 1; i < 9; i++){
+            if (isValid(row+i, col+i)){
+                ChessPosition next = new ChessPosition(row+i, col+i);
+                if(board.getPiece(next) == null){
+                    moves.add(new ChessMove(myPosition, next,null));
+                }
+                else if(board.getPiece(next).getTeamColor() != current){
+                    moves.add(new ChessMove(myPosition, next,null));
+                    break;
+                }
+                else{
+                    break;
+                }
+            }
+            else{
+                break;
+            }
+        }
+        for(int i = 1; i < 9; i++){
+            if (isValid(row+i, col-i)){
+                ChessPosition next = new ChessPosition(row+i, col-i);
+                if(board.getPiece(next) == null){
+                    moves.add(new ChessMove(myPosition, next,null));
+                }
+                else if(board.getPiece(next).getTeamColor() != current){
+                    moves.add(new ChessMove(myPosition, next,null));
+                    break;
+                }
+                else{
+                    break;
+                }
+            }
+            else{
+                break;
+            }
+        }
+        for(int i = 1; i < 9; i++){
+            if (isValid(row-i, col+i)){
+                ChessPosition next = new ChessPosition(row-i, col+i);
+                if(board.getPiece(next) == null){
+                    moves.add(new ChessMove(myPosition, next,null));
+                }
+                else if(board.getPiece(next).getTeamColor() != current){
+                    moves.add(new ChessMove(myPosition, next,null));
+                    break;
+                }
+                else{
+                    break;
+                }
+            }
+            else{
+                break;
+            }
+        }
+        for(int i = 1; i < 9; i++){
+            if (isValid(row-i, col-i)){
+                ChessPosition next = new ChessPosition(row-i, col-i);
+                if(board.getPiece(next) == null){
+                    moves.add(new ChessMove(myPosition, next,null));
+                }
+                else if(board.getPiece(next).getTeamColor() != current){
+                    moves.add(new ChessMove(myPosition, next,null));
+                    break;
+                }
+                else{
+                    break;
+                }
+            }
+            else{
+                break;
+            }
+        }
         return moves;
     }
 
