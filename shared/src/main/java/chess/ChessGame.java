@@ -9,7 +9,8 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
-
+    private TeamColor turn = TeamColor.WHITE;
+    private ChessBoard board = new ChessBoard();
     public ChessGame() {
 
     }
@@ -18,7 +19,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return turn;
     }
 
     /**
@@ -27,7 +28,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        this.turn = team;
     }
 
     /**
@@ -90,13 +91,60 @@ public class ChessGame {
         throw new RuntimeException("Not implemented");
     }
 
+    public boolean checkVertical(TeamColor teamColor, int row, int col){
+        for(int i = row - 1; i > 0; i--){
+            ChessPiece current = board.getPiece(new ChessPosition(i, col));
+            if(current != null){
+                if(current.getPieceType() == ChessPiece.PieceType.QUEEN || current.getPieceType() == ChessPiece.PieceType.ROOK){
+                    return current.getTeamColor() != teamColor;
+                }
+            }
+        }
+        for(int i = row + 1; i < 9; i++){
+            ChessPiece current = board.getPiece(new ChessPosition(i, col));
+            if(current != null){
+                if(current.getPieceType() == ChessPiece.PieceType.QUEEN || current.getPieceType() == ChessPiece.PieceType.ROOK){
+                    return current.getTeamColor() != teamColor;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean checkHorizontal(TeamColor teamColor, int row, int col){
+        for(int i = col - 1; i > 0; i--){
+            ChessPiece current = board.getPiece(new ChessPosition(row, i));
+            if(current != null){
+                if(current.getPieceType() == ChessPiece.PieceType.QUEEN || current.getPieceType() == ChessPiece.PieceType.ROOK){
+                    return current.getTeamColor() != teamColor;
+                }
+            }
+        }
+        for(int i = col + 1; i < 9; i++){
+            ChessPiece current = board.getPiece(new ChessPosition(row, i));
+            if(current != null){
+                if(current.getPieceType() == ChessPiece.PieceType.QUEEN || current.getPieceType() == ChessPiece.PieceType.ROOK){
+                    return current.getTeamColor() != teamColor;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean checkDiagonal(TeamColor teamColor, int row, int col){
+        
+    }
+    public boolean isValid(int row, int col){
+        return row < 9 && row > 0 && col < 9 && col > 0;
+    }
+
     /**
      * Sets this game's chessboard with a given board
      *
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
@@ -105,6 +153,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return board;
     }
 }
