@@ -23,6 +23,23 @@ public class ChessBoard {
         board[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
+    public ChessPosition findPiece(ChessPiece piece) {
+        int r = 1;
+        int c = 1;
+        boolean found = false;
+        for (ChessPiece[] row : board) {
+            c = 1;
+            for (ChessPiece tempPiece : row) {
+                if (piece.equals(tempPiece)) {
+                    return new ChessPosition(r, c);
+                }
+                c += 1;
+            }
+            r += 1;
+        }
+        return null;
+    }
+
     public void movePiece(ChessMove move) {
         ChessPiece current = getPiece(move.getStartPosition());
         ChessPiece.PieceType upgrade = move.getPromotionPiece();
