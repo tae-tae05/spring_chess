@@ -126,6 +126,21 @@ public class ChessGame {
         }
         return false;
     }
+
+    public boolean checkKing(TeamColor color, int row, int col){
+        for(int r = row-1; r < row+2; r++){
+            for(int c = col-1; c < col+2; c++){
+                if(isValid(r, c)) {
+                    ChessPiece current = board.getPiece(new ChessPosition(r, c));
+                    if (current != null && (current.getPieceType() == ChessPiece.PieceType.KING && current.getTeamColor() != color)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
     public boolean checkKnights(TeamColor color, int row, int col){
         int[][] possibilities = { {-2, 1}, {-2, -1}, {1,-2}, {-1, -2}, {1,2}, {-1, 2},
                 {2, 1}, {2, -1}};
