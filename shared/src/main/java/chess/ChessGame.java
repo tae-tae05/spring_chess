@@ -91,6 +91,58 @@ public class ChessGame {
         throw new RuntimeException("Not implemented");
     }
 
+    public boolean checkPawn(TeamColor color, int row, int col){
+        if (color == TeamColor.BLACK) { //- since white can only move up
+            if(isValid(row-1, col-1)) {
+                ChessPiece current = board.getPiece(new ChessPosition(row - 1, col - 1));
+                if (current != null && (current.getPieceType() == ChessPiece.PieceType.PAWN)) {
+                    if (current.getTeamColor() != color) {
+                        return true;
+                    }
+                }
+            }
+            if(isValid(row -1, col + 1)){
+                ChessPiece current = board.getPiece(new ChessPosition(row - 1, col + 1));
+                if (current != null && (current.getPieceType() == ChessPiece.PieceType.PAWN)) {
+                    if (current.getTeamColor() != color) {
+                        return true;
+                    }
+                }
+            }
+        }
+        else {
+            if(isValid(row+1, col-1)) {
+                ChessPiece current = board.getPiece(new ChessPosition(row+1, col - 1));
+                if (current != null && (current.getPieceType() == ChessPiece.PieceType.PAWN)) {
+                    return current.getTeamColor() != color;
+                }
+            }
+            if(isValid(row+1, col + 1)){
+                ChessPiece current = board.getPiece(new ChessPosition(row+1, col + 1));
+                if (current != null && (current.getPieceType() == ChessPiece.PieceType.PAWN)) {
+                    return current.getTeamColor() != color;
+                }
+            }
+        }
+        return false;
+    }
+    public boolean checkKnights(TeamColor color, int row, int col){
+        int[][] possibilities = { {-2, 1}, {-2, -1}, {1,-2}, {-1, -2}, {1,2}, {-1, 2},
+                {2, 1}, {2, -1}};
+        for (int[] possible: possibilities) {
+            int r = row + possible[0];
+            int c = col + possible[1];
+            if(isValid(r, c)){
+                ChessPiece current = board.getPiece(new ChessPosition(r, c));
+                if (current != null && (current.getPieceType() == ChessPiece.PieceType.KNIGHT)) {
+                    if(current.getTeamColor() != color){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
     public boolean checkVertical(TeamColor teamColor, int row, int col){
         for(int i = row - 1; i > 0; i--){
             ChessPiece current = board.getPiece(new ChessPosition(i, col));
@@ -132,8 +184,55 @@ public class ChessGame {
     }
 
     public boolean checkDiagonal(TeamColor teamColor, int row, int col){
-        
+        for(int i = 1; i < 9; i++){
+            if(isValid(row + i, col + i)){
+                ChessPiece current = board.getPiece(new ChessPosition(row + i, col + i));
+                if(current != null){
+                    if(current.getPieceType() == ChessPiece.PieceType.ROOK || current.getPieceType() == ChessPiece.PieceType.QUEEN){
+                        return current.getTeamColor() != teamColor;
+                    }
+                    else if(current.getTeamColor() == teamColor){
+                        return false;
+                    }
+                }
+            }
+            if(isValid(row + i, col - i)){
+                ChessPiece current = board.getPiece(new ChessPosition(row + i, col - i));
+                if(current != null){
+                    if(current.getPieceType() == ChessPiece.PieceType.ROOK || current.getPieceType() == ChessPiece.PieceType.QUEEN){
+                        return current.getTeamColor() != teamColor;
+                    }
+                    else if(current.getTeamColor() == teamColor){
+                        return false;
+                    }
+                }
+            }
+            if(isValid(row - i, col + i)){
+                ChessPiece current = board.getPiece(new ChessPosition(row - i, col + i));
+                if(current != null){
+                    if(current.getPieceType() == ChessPiece.PieceType.ROOK || current.getPieceType() == ChessPiece.PieceType.QUEEN){
+                        return current.getTeamColor() != teamColor;
+                    }
+                    else if(current.getTeamColor() == teamColor){
+                        return false;
+                    }
+                }
+            }
+            if(isValid(row - i, col - i)){
+                ChessPiece current = board.getPiece(new ChessPosition(row - i, col - i));
+                if(current != null){
+                    if(current.getPieceType() == ChessPiece.PieceType.ROOK || current.getPieceType() == ChessPiece.PieceType.QUEEN){
+                        return current.getTeamColor() != teamColor;
+                    }
+                    else if(current.getTeamColor() == teamColor){
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
     }
+
     public boolean isValid(int row, int col){
         return row < 9 && row > 0 && col < 9 && col > 0;
     }
