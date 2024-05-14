@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -47,7 +48,30 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece current_piece = board.getPiece(startPosition);
+        Collection<ChessMove> final_moves = new HashSet<>();
+        if(current_piece == null){
+            return final_moves;
+        }
+        Collection<ChessMove> potential_moves = current_piece.pieceMoves(board, startPosition);
+        if(isInCheckmate(current_piece.getTeamColor())) {
+            return final_moves;
+        }
+        else {
+            for (ChessMove move : potential_moves) {
+                ChessPiece opposite = board.getPiece(move.getEndPosition()); //check if null
+                board.movePiece(move);
+                boolean checker = isInCheck(current_piece.getTeamColor());
+                if (!checker) {
+                    final_moves.add(move);
+                }
+                board.movePiece(new ChessMove(move.getEndPosition(), move.getStartPosition(), move.getPromotionPiece()));
+                if(opposite != null){
+                    board.addPiece(move.getEndPosition(), opposite);
+                }
+            }
+            return final_moves;
+        }
     }
 
     /**
@@ -67,9 +91,18 @@ public class ChessGame {
                     if(current != null){
                         if(current.getTeamColor() == turn){
                             board.movePiece(move);
+                            moved = true;
+                            if (turn == TeamColor.BLACK) {
+                                setTeamTurn(TeamColor.WHITE);
+                            } else {
+                                setTeamTurn(TeamColor.BLACK);
+                            }
                         }
                     }
                 }
+            }
+            if(!moved){
+                throw new InvalidMoveException("Invalid Move");
             }
         }
     }
