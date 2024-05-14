@@ -22,13 +22,20 @@ public class ChessBoard {
     public void addPiece(ChessPosition position, ChessPiece piece) {
         board[position.getRow()-1][position.getColumn()-1] = piece;
     }
-    /**
-     * Gets a chess piece on the chessboard
-     *
-     * @param position The position to get the piece from
-     * @return Either the piece at the position, or null if no piece is at that
-     * position
-     */
+
+    public void movePiece(ChessMove move) {
+        ChessPiece current = getPiece(move.getStartPosition());
+        ChessPiece.PieceType upgrade = move.getPromotionPiece();
+        board[move.getStartPosition().getRow()-1][move.getStartPosition().getColumn() - 1] = null;
+        int r = move.getEndPosition().getRow();
+        int c = move.getEndPosition().getColumn();
+        if(upgrade == null) {
+            board[r-1][c-1] = current;
+        }
+        else{
+            board[r-1][c-1] = new ChessPiece(current.getTeamColor(), upgrade);
+        }
+    }
 
     public void removePiece(ChessPosition position){
         board[position.getRow()-1][position.getColumn()-1] = null;
