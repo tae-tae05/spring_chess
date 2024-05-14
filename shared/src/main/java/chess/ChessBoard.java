@@ -11,6 +11,30 @@ import java.util.Arrays;
 public class ChessBoard {
     private ChessPiece[][] board = new ChessPiece[8][8];
     public ChessBoard() {
+        for(int i = 0; i < 8; i++){
+            ChessPiece pawn = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+            board[1][i] = pawn;
+        }
+        for(int i = 0; i < 8; i++){
+            ChessPiece pawn = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+            board[6][i] = pawn;
+        }
+        board[0][0] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        board[0][7] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        board[7][0] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        board[7][7] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        board[0][1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        board[0][6] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        board[7][1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        board[7][6] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        board[0][2] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        board[0][5] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        board[7][2] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        board[7][5] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        board[0][4] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
+        board[0][3] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+        board[7][4] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
+        board[7][3] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
     }
 
     /**
@@ -105,6 +129,62 @@ public class ChessBoard {
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(board);
+    }
+
+    @Override
+    public String toString() {
+        String chessboard = "|";
+        for(ChessPiece[] row: board){
+            for(ChessPiece piece: row){
+                if(piece == null) {
+                    chessboard += " |";
+                }
+                else{
+                    if(piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                            chessboard += "P|";
+                        }
+                        if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
+                            chessboard += "R|";
+                        }
+                        if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                            chessboard += "N|";
+                        }
+                        if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
+                            chessboard += "B|";
+                        }
+                        if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
+                            chessboard += "Q|";
+                        }
+                        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+                            chessboard += "K|";
+                        }
+                    }
+                    else {
+                        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                            chessboard += "p|";
+                        }
+                        if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
+                            chessboard += "r|";
+                        }
+                        if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                            chessboard += "n|";
+                        }
+                        if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
+                            chessboard += "b|";
+                        }
+                        if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
+                            chessboard += "q|";
+                        }
+                        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+                            chessboard += "k|";
+                        }
+                    }
+                }
+            }
+            chessboard += "\n";
+        }
+        return chessboard;
     }
 }
 

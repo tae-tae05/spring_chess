@@ -16,7 +16,6 @@ public class ChessGame {
     public ChessGame() {
 
     }
-
     /**
      * @return Which team's turn it is
      */
