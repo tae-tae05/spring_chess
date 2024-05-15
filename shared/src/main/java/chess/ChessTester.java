@@ -1,9 +1,9 @@
 package chess;
-
 public class ChessTester {
     public static void main(String[] args){
         ChessGame game = new ChessGame();
         ChessBoard new_board = new ChessBoard();
+//        System.out.println(new_board.toString());
         new_board.emptyBoard();
         new_board.addPiece(new ChessPosition(3, 2), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING));
 
