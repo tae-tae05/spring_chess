@@ -117,6 +117,10 @@ public class ChessBoard {
         squares[7][3] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
         this.board = squares;
     }
+    //for testing purposes
+    public void emptyBoard(){
+        this.board = new ChessPiece[8][8];
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -133,9 +137,12 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        String chessboard = "|";
-        for(ChessPiece[] row: board){
-            for(ChessPiece piece: row){
+        String chessboard = "";
+        for(int i = 7; i > -1; i--){
+            ChessPiece[] row = board[i];
+            chessboard += "|";
+            for(int j = 0; j < 8; j++){
+                ChessPiece piece = row[j];
                 if(piece == null) {
                     chessboard += " |";
                 }

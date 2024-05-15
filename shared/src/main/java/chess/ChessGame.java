@@ -146,15 +146,16 @@ public class ChessGame {
                 for (int r = kingSpot.getRow() - 1; r < kingSpot.getRow() + 2; r++) {
                     for (int c = kingSpot.getColumn() - 1; c < kingSpot.getColumn() + 2; c++) {
                         if (isValid(r, c)) {
-                            boolean knights = checkKnights(teamColor, r, c);
-                            boolean diagonal = checkDiagonal(teamColor, r, c);
-                            boolean horizontal = checkHorizontal(teamColor, r, c);
-                            boolean vertical = checkVertical(teamColor, r, c);
-                            boolean pawns = checkPawn(teamColor, r, c);
-                            boolean kingCheck = checkKing(teamColor, r, c);
-                            check = knights || diagonal || horizontal || vertical || pawns || kingCheck; //checking if anything can eat
+                            if (board.getPiece(new ChessPosition(r, c)) != null && board.getPiece(new ChessPosition(r, c)).getTeamColor()!= teamColor) {
+                                boolean knights = checkKnights(teamColor, r, c);
+                                boolean diagonal = checkDiagonal(teamColor, r, c);
+                                boolean horizontal = checkHorizontal(teamColor, r, c);
+                                boolean vertical = checkVertical(teamColor, r, c);
+                                boolean pawns = checkPawn(teamColor, r, c);
+                                boolean kingCheck = checkKing(teamColor, r, c);
+                                check = knights || diagonal || horizontal || vertical || pawns || kingCheck; //checking if anything can eat
+                            }
                         }
-
                     }
                 }
             }
@@ -165,8 +166,6 @@ public class ChessGame {
             for (ChessMove move : potential_moves) {
                 ChessPiece opposite = board.getPiece(move.getEndPosition()); //check if null
                 board.movePiece(move);
-//                System.out.println("check= " + isInCheck(current_piece.getTeamColor()));
-//                System.out.println(move);
                 if(!isInCheck(king.getTeamColor())) {
                     check = false;
                 }
