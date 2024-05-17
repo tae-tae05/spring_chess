@@ -1,9 +1,11 @@
-package chess;
+package chess.Moves;
+
+import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class KnightMoves implements MovesCalculator{
+public class KnightMoves implements MovesCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor current) {
         int row = myPosition.getRow();

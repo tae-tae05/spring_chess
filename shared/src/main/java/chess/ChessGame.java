@@ -1,4 +1,5 @@
 package chess;
+import chess.check.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -53,11 +54,8 @@ public class ChessGame {
         if(current_piece == null){
             return final_moves;
         }
-        Collection<ChessMove> potential_moves = current_piece.pieceMoves(board, startPosition);
-        if(isInCheckmate(current_piece.getTeamColor())) {
-            return final_moves;
-        }
-        else {
+        else{
+            Collection<ChessMove> potential_moves = current_piece.pieceMoves(board, startPosition);
             for (ChessMove move : potential_moves) {
                 ChessPiece opposite = board.getPiece(move.getEndPosition()); //check if null
                 board.movePiece(move);
@@ -66,13 +64,16 @@ public class ChessGame {
                     final_moves.add(move);
                 }
                 board.movePiece(new ChessMove(move.getEndPosition(), move.getStartPosition(), move.getPromotionPiece()));
-                if(opposite != null){
+                if (opposite != null) {
                     board.addPiece(move.getEndPosition(), opposite);
                 }
             }
+
             return final_moves;
         }
+
     }
+
 
     /**
      * Makes a move in a chess game
@@ -105,6 +106,9 @@ public class ChessGame {
                 throw new InvalidMoveException("Invalid Move");
             }
         }
+        else{
+            throw new InvalidMoveException("Invalid Move");
+        }
     }
 
     /**
@@ -117,20 +121,22 @@ public class ChessGame {
         ChessPiece king = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
         ChessPosition kingSpot = board.findPiece(king);
         if(kingSpot != null) {
-            boolean knights = checkKnights(teamColor, kingSpot.getRow(), kingSpot.getColumn());
-            boolean diagonal = checkDiagonal(teamColor, kingSpot.getRow(), kingSpot.getColumn());
-            boolean horizontal = checkHorizontal(teamColor, kingSpot.getRow(), kingSpot.getColumn());
-            boolean vertical = checkVertical(teamColor, kingSpot.getRow(), kingSpot.getColumn());
-            boolean pawns = checkPawn(teamColor, kingSpot.getRow(), kingSpot.getColumn());
-            boolean kingCheck = checkKing(teamColor, kingSpot.getRow(), kingSpot.getColumn());
+            CheckKnights knight = new CheckKnights();
+            boolean knights = knight.checkDirection(teamColor, kingSpot.getRow(), kingSpot.getColumn(), board);
+            CheckDiagonal diag = new CheckDiagonal();
+            boolean diagonal = diag.checkDirection(teamColor, kingSpot.getRow(), kingSpot.getColumn(), board);
+            CheckHorizontal hori = new CheckHorizontal();
+            boolean horizontal = hori.checkDirection(teamColor, kingSpot.getRow(), kingSpot.getColumn(), board);
+            CheckVertical vert = new CheckVertical();
+            boolean vertical = vert.checkDirection(teamColor, kingSpot.getRow(), kingSpot.getColumn(), board);
+            CheckPawn pawn = new CheckPawn();
+            boolean pawns = pawn.checkDirection(teamColor, kingSpot.getRow(), kingSpot.getColumn(), board);
+            CheckKing King = new CheckKing();
+            boolean kingCheck = King.checkDirection(teamColor, kingSpot.getRow(), kingSpot.getColumn(), board);
             return knights || diagonal || horizontal || vertical || pawns || kingCheck;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
-
     /**
      * Determines if the given team is in checkmate
      *
@@ -143,16 +149,22 @@ public class ChessGame {
         boolean check = false;
         if(kingSpot != null) {
             if (isInCheck(teamColor)) {
-                for (int r = kingSpot.getRow() - 1; r < kingSpot.getRow() + 2; r++) {
-                    for (int c = kingSpot.getColumn() - 1; c < kingSpot.getColumn() + 2; c++) {
+                for (int r = kingSpot.getRow() - 1; r < kingSpot.getRow() + 3; r++) {
+                    for (int c = kingSpot.getColumn() - 1; c < kingSpot.getColumn() + 3; c++) {
                         if (isValid(r, c)) {
-                            if (board.getPiece(new ChessPosition(r, c)) != null && board.getPiece(new ChessPosition(r, c)).getTeamColor()!= teamColor) {
-                                boolean knights = checkKnights(teamColor, r, c);
-                                boolean diagonal = checkDiagonal(teamColor, r, c);
-                                boolean horizontal = checkHorizontal(teamColor, r, c);
-                                boolean vertical = checkVertical(teamColor, r, c);
-                                boolean pawns = checkPawn(teamColor, r, c);
-                                boolean kingCheck = checkKing(teamColor, r, c);
+                            if (board.getPiece(new ChessPosition(r, c)) == null || board.getPiece(new ChessPosition(r, c)).getTeamColor() != teamColor) {
+                                CheckKnights knight = new CheckKnights();
+                                boolean knights = knight.checkDirection(teamColor, r, c, board);
+                                CheckDiagonal diag = new CheckDiagonal();
+                                boolean diagonal = diag.checkDirection(teamColor, r, c, board);
+                                CheckHorizontal hori = new CheckHorizontal();
+                                boolean horizontal = hori.checkDirection(teamColor, r, c, board);
+                                CheckVertical vert = new CheckVertical();
+                                boolean vertical = vert.checkDirection(teamColor, r, c, board);
+                                CheckPawn pawn = new CheckPawn();
+                                boolean pawns = pawn.checkDirection(teamColor, r, c, board);
+                                CheckKing King = new CheckKing();
+                                boolean kingCheck = King.checkDirection(teamColor, r, c, board);
                                 check = knights || diagonal || horizontal || vertical || pawns || kingCheck; //checking if anything can eat
                             }
                         }
@@ -161,17 +173,15 @@ public class ChessGame {
             }
         }
         if(check){
-            ChessPosition startPosition = new ChessPosition(kingSpot.getRow(), kingSpot.getColumn());
-            Collection<ChessMove> potential_moves = king.pieceMoves(board, startPosition);
-            for (ChessMove move : potential_moves) {
-                ChessPiece opposite = board.getPiece(move.getEndPosition()); //check if null
-                board.movePiece(move);
-                if(!isInCheck(king.getTeamColor())) {
-                    check = false;
-                }
-                board.movePiece(new ChessMove(move.getEndPosition(), move.getStartPosition(), move.getPromotionPiece()));
-                if(opposite != null){
-                    board.addPiece(move.getEndPosition(), opposite);
+            for(int r = 1; r < 9; r++){
+                for(int c = 1; c < 9; c++){
+                    ChessPosition current = new ChessPosition(r,c);
+                    if(board.getPiece(current)!= null && board.getPiece(current).getTeamColor() == teamColor){
+                        Collection<ChessMove> test = validMoves(current);
+                        if(!test.isEmpty()){
+                            return false;
+                        }
+                    }
                 }
             }
         }
@@ -197,164 +207,7 @@ public class ChessGame {
                 }
             }
         }
-        return true;
-    }
-
-    public boolean checkPawn(TeamColor color, int row, int col){
-        if (color == TeamColor.BLACK) { //- since white can only move up
-            if(isValid(row-1, col-1)) {
-                ChessPiece current = board.getPiece(new ChessPosition(row - 1, col - 1));
-                if (current != null && (current.getPieceType() == ChessPiece.PieceType.PAWN)) {
-                    if (current.getTeamColor() != color) {
-                        return true;
-                    }
-                }
-            }
-            if(isValid(row -1, col + 1)){
-                ChessPiece current = board.getPiece(new ChessPosition(row - 1, col + 1));
-                if (current != null && (current.getPieceType() == ChessPiece.PieceType.PAWN)) {
-                    if (current.getTeamColor() != color) {
-                        return true;
-                    }
-                }
-            }
-        }
-        else {
-            if(isValid(row+1, col-1)) {
-                ChessPiece current = board.getPiece(new ChessPosition(row+1, col - 1));
-                if (current != null && (current.getPieceType() == ChessPiece.PieceType.PAWN)) {
-                    return current.getTeamColor() != color;
-                }
-            }
-            if(isValid(row+1, col + 1)){
-                ChessPiece current = board.getPiece(new ChessPosition(row+1, col + 1));
-                if (current != null && (current.getPieceType() == ChessPiece.PieceType.PAWN)) {
-                    return current.getTeamColor() != color;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean checkKing(TeamColor color, int row, int col){
-        for(int r = row-1; r < row+2; r++){
-            for(int c = col-1; c < col+2; c++){
-                if(isValid(r, c)) {
-                    ChessPiece current = board.getPiece(new ChessPosition(r, c));
-                    if (current != null && (current.getPieceType() == ChessPiece.PieceType.KING && current.getTeamColor() != color)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean checkKnights(TeamColor color, int row, int col){
-        int[][] possibilities = { {-2, 1}, {-2, -1}, {1,-2}, {-1, -2}, {1,2}, {-1, 2},
-                {2, 1}, {2, -1}};
-        for (int[] possible: possibilities) {
-            int r = row + possible[0];
-            int c = col + possible[1];
-            if(isValid(r, c)){
-                ChessPiece current = board.getPiece(new ChessPosition(r, c));
-                if (current != null && (current.getPieceType() == ChessPiece.PieceType.KNIGHT)) {
-                    if(current.getTeamColor() != color){
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-    public boolean checkVertical(TeamColor teamColor, int row, int col){
-        for(int i = row - 1; i > 0; i--){
-            ChessPiece current = board.getPiece(new ChessPosition(i, col));
-            if(current != null){
-                if(current.getPieceType() == ChessPiece.PieceType.QUEEN || current.getPieceType() == ChessPiece.PieceType.ROOK){
-                    return current.getTeamColor() != teamColor;
-                }
-            }
-        }
-        for(int i = row + 1; i < 9; i++){
-            ChessPiece current = board.getPiece(new ChessPosition(i, col));
-            if(current != null){
-                if(current.getPieceType() == ChessPiece.PieceType.QUEEN || current.getPieceType() == ChessPiece.PieceType.ROOK){
-                    return current.getTeamColor() != teamColor;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean checkHorizontal(TeamColor teamColor, int row, int col){
-        for(int i = col - 1; i > 0; i--){
-            ChessPiece current = board.getPiece(new ChessPosition(row, i));
-            if(current != null){
-                if(current.getPieceType() == ChessPiece.PieceType.QUEEN || current.getPieceType() == ChessPiece.PieceType.ROOK){
-                    return current.getTeamColor() != teamColor;
-                }
-            }
-        }
-        for(int i = col + 1; i < 9; i++){
-            ChessPiece current = board.getPiece(new ChessPosition(row, i));
-            if(current != null){
-                if(current.getPieceType() == ChessPiece.PieceType.QUEEN || current.getPieceType() == ChessPiece.PieceType.ROOK){
-                    return current.getTeamColor() != teamColor;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean checkDiagonal(TeamColor teamColor, int row, int col){
-        for(int i = 1; i < 9; i++){
-            if(isValid(row + i, col + i)){
-                ChessPiece current = board.getPiece(new ChessPosition(row + i, col + i));
-                if(current != null){
-                    if(current.getPieceType() == ChessPiece.PieceType.ROOK || current.getPieceType() == ChessPiece.PieceType.QUEEN){
-                        return current.getTeamColor() != teamColor;
-                    }
-                    else if(current.getTeamColor() == teamColor){
-                        return false;
-                    }
-                }
-            }
-            if(isValid(row + i, col - i)){
-                ChessPiece current = board.getPiece(new ChessPosition(row + i, col - i));
-                if(current != null){
-                    if(current.getPieceType() == ChessPiece.PieceType.ROOK || current.getPieceType() == ChessPiece.PieceType.QUEEN){
-                        return current.getTeamColor() != teamColor;
-                    }
-                    else if(current.getTeamColor() == teamColor){
-                        return false;
-                    }
-                }
-            }
-            if(isValid(row - i, col + i)){
-                ChessPiece current = board.getPiece(new ChessPosition(row - i, col + i));
-                if(current != null){
-                    if(current.getPieceType() == ChessPiece.PieceType.ROOK || current.getPieceType() == ChessPiece.PieceType.QUEEN){
-                        return current.getTeamColor() != teamColor;
-                    }
-                    else if(current.getTeamColor() == teamColor){
-                        return false;
-                    }
-                }
-            }
-            if(isValid(row - i, col - i)){
-                ChessPiece current = board.getPiece(new ChessPosition(row - i, col - i));
-                if(current != null){
-                    if(current.getPieceType() == ChessPiece.PieceType.ROOK || current.getPieceType() == ChessPiece.PieceType.QUEEN){
-                        return current.getTeamColor() != teamColor;
-                    }
-                    else if(current.getTeamColor() == teamColor){
-                        return false;
-                    }
-                }
-            }
-        }
-        return false;
+        return !isInCheckmate(teamColor);
     }
 
     public boolean isValid(int row, int col){
