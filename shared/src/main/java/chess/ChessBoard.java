@@ -23,6 +23,7 @@ public class ChessBoard {
         board[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
+
     public ChessPosition findPiece(ChessPiece piece) {
         int r = 1;
         int c = 1;

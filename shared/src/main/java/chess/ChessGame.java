@@ -98,6 +98,7 @@ public class ChessGame {
                     if(current != null){
                         if(current.getTeamColor() == turn){
                             board.movePiece(move);
+                            System.out.println(board.toString());
                             moved = true;
                             if (turn == TeamColor.BLACK) {
                                 setTeamTurn(TeamColor.WHITE);
@@ -229,7 +230,7 @@ public class ChessGame {
                 }
             }
         }
-        return true;
+        return !isInCheckmate(teamColor);
     }
 
 
