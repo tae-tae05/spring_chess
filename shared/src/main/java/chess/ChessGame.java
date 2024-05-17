@@ -2,6 +2,7 @@ package chess;
 
 import chess.check.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -55,11 +56,8 @@ public class ChessGame {
         if(current_piece == null){
             return final_moves;
         }
-        Collection<ChessMove> potential_moves = current_piece.pieceMoves(board, startPosition);
-        if(isInCheckmate(current_piece.getTeamColor())) {
-            return final_moves;
-        }
-        else {
+        else{
+            Collection<ChessMove> potential_moves = current_piece.pieceMoves(board, startPosition);
             for (ChessMove move : potential_moves) {
                 ChessPiece opposite = board.getPiece(move.getEndPosition()); //check if null
                 board.movePiece(move);
@@ -68,13 +66,20 @@ public class ChessGame {
                     final_moves.add(move);
                 }
                 board.movePiece(new ChessMove(move.getEndPosition(), move.getStartPosition(), move.getPromotionPiece()));
-                if(opposite != null){
+                if (opposite != null) {
                     board.addPiece(move.getEndPosition(), opposite);
                 }
             }
+
             return final_moves;
         }
+
     }
+
+    /**
+     * call this function when you're in check and trying to see if anything else can move to save the king
+     */
+
 
     /**
      * Makes a move in a chess game
@@ -106,6 +111,9 @@ public class ChessGame {
             if(!moved){
                 throw new InvalidMoveException("Invalid Move");
             }
+        }
+        else{
+            throw new InvalidMoveException("Invalid Move");
         }
     }
 
@@ -151,7 +159,7 @@ public class ChessGame {
                 for (int r = kingSpot.getRow() - 1; r < kingSpot.getRow() + 3; r++) {
                     for (int c = kingSpot.getColumn() - 1; c < kingSpot.getColumn() + 3; c++) {
                         if (isValid(r, c)) {
-                            if (board.getPiece(new ChessPosition(r, c)) != null && board.getPiece(new ChessPosition(r, c)).getTeamColor()!= teamColor) {
+                            if (board.getPiece(new ChessPosition(r, c)) == null || board.getPiece(new ChessPosition(r, c)).getTeamColor() != teamColor) {
                                 CheckKnights knight = new CheckKnights();
                                 boolean knights = knight.checkDirection(teamColor, r, c, board);
                                 CheckDiagonal diag = new CheckDiagonal();
@@ -166,6 +174,19 @@ public class ChessGame {
                                 boolean kingCheck = King.checkDirection(teamColor, r, c, board);
                                 check = knights || diagonal || horizontal || vertical || pawns || kingCheck; //checking if anything can eat
                             }
+                        }
+                    }
+                }
+            }
+        }
+        if(check){
+            for(int r = 1; r < 9; r++){
+                for(int c = 1; c < 9; c++){
+                    ChessPosition current = new ChessPosition(r,c);
+                    if(board.getPiece(current)!= null && board.getPiece(current).getTeamColor() == teamColor){
+                        Collection<ChessMove> test = validMoves(current);
+                        if(!test.isEmpty()){
+                            return false;
                         }
                     }
                 }
