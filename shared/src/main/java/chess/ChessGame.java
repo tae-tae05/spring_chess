@@ -98,7 +98,6 @@ public class ChessGame {
                     if(current != null){
                         if(current.getTeamColor() == turn){
                             board.movePiece(move);
-                            System.out.println(board.toString());
                             moved = true;
                             if (turn == TeamColor.BLACK) {
                                 setTeamTurn(TeamColor.WHITE);
@@ -193,21 +192,6 @@ public class ChessGame {
                 }
             }
         }
-//        if(check){
-//            ChessPosition startPosition = new ChessPosition(kingSpot.getRow(), kingSpot.getColumn());
-//            Collection<ChessMove> potential_moves = king.pieceMoves(board, startPosition);
-//            for (ChessMove move : potential_moves) {
-//                ChessPiece opposite = board.getPiece(move.getEndPosition()); //check if null
-//                board.movePiece(move);
-//                if(!isInCheck(king.getTeamColor())) {
-//                    check = false;
-//                }
-//                board.movePiece(new ChessMove(move.getEndPosition(), move.getStartPosition(), move.getPromotionPiece()));
-//                if(opposite != null){
-//                    board.addPiece(move.getEndPosition(), opposite);
-//                }
-//            }
-//        }
         return check;
     }
 
