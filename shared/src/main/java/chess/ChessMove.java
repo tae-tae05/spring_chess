@@ -9,29 +9,29 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessMove {
-    private final ChessPosition start;
-    private final ChessPosition end;
-    private final ChessPiece.PieceType promote;
+    private final ChessPosition START;
+    private final ChessPosition END;
+    private final ChessPiece.PieceType PROMOTE;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
-        this.start = startPosition;
-        this.end = endPosition;
-        this.promote = promotionPiece;
+        this.START = startPosition;
+        this.END = endPosition;
+        this.PROMOTE = promotionPiece;
     }
 
     /**
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
-        return start;
+        return START;
     }
 
     /**
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
-        return end;
+        return END;
     }
     /**
      * Gets the type of piece to promote a pawn to if pawn promotion is part of this
@@ -40,7 +40,7 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        return promote;
+        return PROMOTE;
     }
 
     @Override
@@ -48,20 +48,20 @@ public class ChessMove {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessMove chessMove = (ChessMove) o;
-        return Objects.equals(start, chessMove.start) && Objects.equals(end, chessMove.end) && promote == chessMove.promote;
+        return Objects.equals(START, chessMove.START) && Objects.equals(END, chessMove.END) && PROMOTE == chessMove.PROMOTE;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(start, end, promote);
+        return Objects.hash(START, END, PROMOTE);
     }
 
 
     @Override
     public String toString() {
         return "ChessMove{" +
-                "start=" + start +
-                ", end=" + end +
+                "start=" + START +
+                ", end=" + END +
                 '}' + "\n";
     }
 }
