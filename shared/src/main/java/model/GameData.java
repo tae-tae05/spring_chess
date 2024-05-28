@@ -30,4 +30,4 @@ import chess.ChessGame;
 //        return GAME_NAME;
 //    }
 //}
- record GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game){}
+public record GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game){}
