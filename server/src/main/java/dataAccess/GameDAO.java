@@ -8,9 +8,9 @@ import java.util.Collection;
 
 public interface GameDAO {
     Collection<GameData> games = new ArrayList<>();
-    ChessGame getGame(GameData game);
+    GameData getGame(GameData game) throws DataAccessException;
     void updateGames(ChessGame game);
     Collection<GameData> listGames();
-    boolean verifyGamePosition();
+    GameData verifyGamePosition() throws DataAccessException;
     void deleteGames();
 }

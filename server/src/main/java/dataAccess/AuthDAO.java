@@ -8,7 +8,8 @@ import java.util.Collection;
 
 public interface AuthDAO {
     Collection<AuthData> auths = new ArrayList<>();
-    AuthData createAuth(UserData user);
+    void createAuth(AuthData auth);
     boolean verifyUserAuth(AuthData auth);
     void deleteAuth();
+    Collection<AuthData> getAuths();
 }

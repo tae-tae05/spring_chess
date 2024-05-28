@@ -3,22 +3,29 @@ package dataAccess;
 import chess.ChessGame;
 import model.GameData;
 
+import javax.xml.crypto.Data;
 import java.util.Collection;
+import java.util.Optional;
 
 public class MemoryGameDAO implements GameDAO{
     @Override
-    public ChessGame getGame(GameData game) {
-        return null;
+    public GameData getGame(GameData game) throws DataAccessException{
+        for(GameData spot:games) {
+            if (spot.equals(game)){
+                return spot;
+            }
+        }
+        throw new DataAccessException("game does not exist");
     }
 
     @Override
-    public boolean verifyGamePosition() {
-        return false;
+    public GameData verifyGamePosition() throws DataAccessException{
+        return null;
     }
 
     @Override
     public Collection<GameData> listGames() {
-        return null;
+        return games;
     }
 
     @Override
