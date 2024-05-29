@@ -2,17 +2,11 @@ package service;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
 import dataAccess.MemoryGameDAO;
-import dataAccess.MemoryUserDAO;
 import model.GameData;
-import model.UserData;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
-import java.util.Collection;
-
-public class GameTests {
+public class GameDAOTests {
     @Test
     public void gamer(){
         GameData game = new GameData(1345, "Jin", "Unnie", "beat unnie", new ChessGame());

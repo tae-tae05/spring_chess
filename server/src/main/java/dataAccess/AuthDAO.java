@@ -5,11 +5,13 @@ import model.UserData;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public interface AuthDAO {
-    Collection<AuthData> auths = new ArrayList<>();
+    List<AuthData> auths = new ArrayList<>();
     void createAuth(AuthData auth);
     boolean verifyUserAuth(AuthData auth);
-    void deleteAuth();
+    void deleteAuth(AuthData auth) throws DataAccessException;
+    void clear();
     Collection<AuthData> getAuths();
 }

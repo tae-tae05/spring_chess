@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class UserTests {
+public class UserDAOTests {
     @Test
     public void addUser() throws DataAccessException {
         MemoryUserDAO userDAO = new MemoryUserDAO();
