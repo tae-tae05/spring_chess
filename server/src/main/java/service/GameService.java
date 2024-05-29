@@ -11,10 +11,10 @@ public class GameService {
     private MemoryGameDAO GAMES_DB = new MemoryGameDAO();
 
     public GameData createGame(GameData game){
-
+        return null;
     }
     public GameData joinGame(){
-
+        return null;
     }
     public void clearGames(){
         GAMES_DB.deleteGames();

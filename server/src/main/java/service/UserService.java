@@ -14,19 +14,22 @@ public class UserService {
     private MemoryUserDAO USERS_DB = new MemoryUserDAO();
     private MemoryAuthDAO AUTH_DB = new MemoryAuthDAO();
     public AuthData register(UserData user) throws DataAccessException {
-        //check if username is taken
+        var serializer = new Gson();
         boolean inUsers = USERS_DB.getUser(user);
-        //add user to db
         if(!inUsers){
             USERS_DB.createUser(user);
         }
-        //create and add/return AuthData
-        return new AuthData(UUID.randomUUID().toString(), user.username());
+        AuthData one = new AuthData(UUID.randomUUID().toString(), user.username());
+        var toJson = serializer.toJson(one);
+        return serializer.fromJson(toJson, AuthData.class);
     }
     public AuthData login(UserData user) throws DataAccessException{
+        var serializer = new Gson();
         boolean inUsers = USERS_DB.getUser(user);
         if(inUsers){
-            return new AuthData(UUID.randomUUID().toString(), user.username());
+            AuthData one = new AuthData(UUID.randomUUID().toString(), user.username());
+            var toJson = serializer.toJson(one);
+            return serializer.fromJson(toJson, AuthData.class);
         }
         throw new DataAccessException("not in users");
     }
