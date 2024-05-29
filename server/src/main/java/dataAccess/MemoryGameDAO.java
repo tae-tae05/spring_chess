@@ -8,15 +8,6 @@ import java.util.Collection;
 import java.util.Optional;
 
 public class MemoryGameDAO implements GameDAO{
-//    @Override
-//    public GameData getGame(GameData game) throws DataAccessException{
-//        for(GameData spot:games) {
-//            if (spot.equals(game)){
-//                return spot;
-//            }
-//        }
-//        throw new DataAccessException("game does not exist");
-//    }
 
     @Override
     public void addGame(GameData game) throws DataAccessException {
