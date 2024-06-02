@@ -7,8 +7,23 @@ import java.util.Collection;
 public class MemoryUserDAO implements UserDAO{
     @Override
     public boolean getUser(UserData user) {
-        return users.contains((user));
-        //returns true if it is in, false if it is not in the list
+        for(UserData current: users){
+            if(current.username().equals(user.username())){
+                return true;
+                //returns true if it exists
+            }
+        }
+        return false;
+        //returns false if it does not exist
+    }
+    public boolean checkUser(String username, String password){
+        for(UserData current: users){
+            if(current.username().equals(username) && current.password().equals(password)){
+                return true;
+                //returns true if it exists
+            }
+        }
+        return false;
     }
     @Override
     public void createUser(UserData user) throws DataAccessException{

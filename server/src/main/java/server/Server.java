@@ -1,12 +1,11 @@
 package server;
 
-import com.google.gson.Gson;
+import handlers.*;
+import model.GameData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import spark.*;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import static spark.Spark.get;
 
@@ -21,31 +20,15 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        Spark.post("/user", this::userBody);
-//        Spark.delete("/db/:users", this::clearUsers);
+        Spark.post("/user", new RegisterHandler());
+        Spark.delete("/db", new ClearHandlers());
+        Spark.post("/session", new LoginHandler());
+//        Spark.delete("/session", new LogoutHandler());
+//        Spark.get("/game", new ListGamesHandler());
+//        Spark.post("/game", new CreateGameHandler());
+//        Spark.put("/game", new JoinGameHandler());
         Spark.awaitInitialization();
         return Spark.port();
-    }
-
-    private Object userBody(Request req, Response res){
-        var bodyObj = getBody(req, Map.class);
-
-        res.type("application/json");
-        return new Gson().toJson(bodyObj);
-    }
-
-
-    private static <T> T getBody(Request request, Class<T> clazz) {
-        var body = new Gson().fromJson(request.body(), clazz);
-        if (body == null) {
-            throw new RuntimeException("missing required body");
-        }
-        return body;
-    }
-
-    private Object listUser(Request req, Response res){
-        res.type("application/json");
-        return new Gson().toJson(Map.of("user", users));
     }
 
     public void stop() {

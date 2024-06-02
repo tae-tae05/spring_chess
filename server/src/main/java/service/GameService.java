@@ -5,6 +5,8 @@ import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
 import dataAccess.MemoryGameDAO;
 import model.GameData;
+import results.ClearResults;
+import spark.Response;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,9 +20,7 @@ public class GameService {
     public GameData joinGame(int gameID, ChessGame.TeamColor teamColor, String username) throws DataAccessException {
         return GAMES_DB.verifyGamePosition(gameID,teamColor, username);
     }
-    public void clearGames(){
-        GAMES_DB.deleteGames();
-    }
+
     public Collection<GameData> listGames(){
         return GAMES_DB.listGames();
     }
