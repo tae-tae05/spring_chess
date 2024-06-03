@@ -43,6 +43,7 @@ public class GameService {
     }
     public LogoutAndJoinResults joinGame(JoinGameRequest join, AuthData auth, Response response) throws DataAccessException {
         LogoutAndJoinResults results = new LogoutAndJoinResults(null);
+        System.out.println(join.toString());
         if(!AUTH_DB.verifyUserAuth(auth)){
             results = results.setMessage("Error: unauthorized");
             response.status(401);
@@ -65,8 +66,6 @@ public class GameService {
             return results;
         }
         try{
-//            System.out.println(join.toString());
-//            System.out.println(auth.Username());
             if(join.getTeamColor().equals("BLACK")){
                 GAMES_DB.insertUsername(join.getGameID(), auth.Username(), ChessGame.TeamColor.BLACK);
             }
