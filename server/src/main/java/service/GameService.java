@@ -2,27 +2,84 @@ package service;
 
 import chess.ChessGame;
 import dataAccess.DataAccessException;
-import dataAccess.GameDAO;
 import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryGameDAO;
 import model.AuthData;
 import model.GameData;
-import results.ClearResults;
-import results.ListGameResults;
+import request.JoinGameRequest;
+import results.*;
 import spark.Response;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Random;
 
 public class GameService {
     private MemoryGameDAO GAMES_DB = new MemoryGameDAO();
     private MemoryAuthDAO AUTH_DB = new MemoryAuthDAO();
 
-    public void createGame(GameData game) throws DataAccessException {
-        GAMES_DB.addGame(game);
+    public CreateGameResults createGame(GameData game, AuthData auth, Response response) throws DataAccessException {
+        CreateGameResults results = new CreateGameResults();
+        if(!AUTH_DB.verifyUserAuth(auth)){
+            results.setMessage("Error: unauthorized");
+            response.status(401);
+            return results;
+        }
+        if(game.gameName() == null){
+            results.setMessage("Error: bad request");
+            response.status(400);
+            return results;
+        }
+        try{
+            Random rand = new Random();
+            int tempGameID = rand.nextInt((1000) + 1);
+            game = game.setGameID(tempGameID);
+            GAMES_DB.addGame(game);
+            results.setGameID(game.gameID());
+        }
+        catch(Exception e){
+            results.setMessage("Error: " + e.getMessage());
+            response.status(500);
+        }
+        return results;
     }
-    public GameData joinGame(int gameID, ChessGame.TeamColor teamColor, String username) throws DataAccessException {
-        return GAMES_DB.verifyGamePosition(gameID,teamColor, username);
+    public LogoutAndJoinResults joinGame(JoinGameRequest join, AuthData auth, Response response) throws DataAccessException {
+        LogoutAndJoinResults results = new LogoutAndJoinResults(null);
+        if(!AUTH_DB.verifyUserAuth(auth)){
+            results = results.setMessage("Error: unauthorized");
+            response.status(401);
+            return results;
+        }
+        if(join.getTeamColor() == null){
+            results = results.setMessage("Error: bad request");
+            response.status(400);
+            return results;
+        }
+//        if(join.getTeamColor() == ChessGame.TeamColor.BLACK && GAMES_DB.verifyBlackPosition(join.getGameID()))
+        if(join.getTeamColor().equals("BLACK") && GAMES_DB.verifyBlackPosition(join.getGameID())){
+            results = results.setMessage("Error: already taken");
+            response.status(403);
+            return results;
+        }
+        if(join.getTeamColor().equals("WHITE") && GAMES_DB.verifyWhitePosition(join.getGameID())){
+            results = results.setMessage("Error: already taken");
+            response.status(400);
+            return results;
+        }
+        try{
+//            System.out.println(join.toString());
+//            System.out.println(auth.Username());
+            if(join.getTeamColor().equals("BLACK")){
+                GAMES_DB.insertUsername(join.getGameID(), auth.Username(), ChessGame.TeamColor.BLACK);
+            }
+            else{
+                GAMES_DB.insertUsername(join.getGameID(), auth.Username(), ChessGame.TeamColor.WHITE);
+            }
+            response.status(200);
+        }
+        catch(Exception e){
+            results = results.setMessage("Error: " + e.getMessage());
+            response.status(500);
+        }
+        return results;
     }
 
     public ListGameResults listGames(AuthData auth, Response response){

@@ -33,25 +33,25 @@ public class GameDAOTests {
         Assertions.assertEquals(0, testGames.listGames().size(),
                 "game was not deleted correctly");
     }
-    @Test
-    public void verify() throws DataAccessException{
-        MemoryGameDAO testGames = new MemoryGameDAO();
-        testGames.addGame(new GameData(1345, "Jin", "Unnie",
-                "beat unnie", new ChessGame()));
-        testGames.addGame(new GameData(2345, null, "Joon",
-                "bin beat joon", new ChessGame()));
-        testGames.addGame(new GameData(3345, "Unnie", null,
-                "STALEMATE", new ChessGame()));
-        GameData comparison = testGames.verifyGamePosition(3345, ChessGame.TeamColor.BLACK, "Bin");
-        GameData comparison2 = testGames.verifyGamePosition(2345, ChessGame.TeamColor.WHITE, "Bin");
+//    @Test
+//    public void verify() throws DataAccessException{
+//        MemoryGameDAO testGames = new MemoryGameDAO();
+//        testGames.addGame(new GameData(1345, "Jin", "Unnie",
+//                "beat unnie", new ChessGame()));
+//        testGames.addGame(new GameData(2345, null, "Joon",
+//                "bin beat joon", new ChessGame()));
+//        testGames.addGame(new GameData(3345, "Unnie", null,
+//                "STALEMATE", new ChessGame()));
+//        GameData comparison = testGames.verifyGamePosition(3345, ChessGame.TeamColor.BLACK, "Bin");
+//        GameData comparison2 = testGames.verifyGamePosition(2345, ChessGame.TeamColor.WHITE, "Bin");
 
 
-        Assertions.assertEquals(new GameData(3345, "Unnie", "Bin",
-                "STALEMATE", new ChessGame()), comparison,
-                "black was not updated correctly");
-        Assertions.assertEquals(new GameData(2345, "Bin", "Joon",
-                        "bin beat joon", new ChessGame()), comparison2,
-                "white was not updated correctly");
-    }
+//        Assertions.assertEquals(new GameData(3345, "Unnie", "Bin",
+//                "STALEMATE", new ChessGame()), comparison,
+//                "black was not updated correctly");
+//        Assertions.assertEquals(new GameData(2345, "Bin", "Joon",
+//                        "bin beat joon", new ChessGame()), comparison2,
+//                "white was not updated correctly");
+//    }
 
 }

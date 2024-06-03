@@ -20,27 +20,43 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     //adds a player after confirming game exists
-    public GameData verifyGamePosition(int gameID, ChessGame.TeamColor teamcolor, String playerName) throws DataAccessException{
-        int counter = 0;
-        for(int i = 0; i < games.size(); i++) {
-            int gameid = games.get(i).gameID();
-            if(gameID == gameid){
-                if(games.get(i).blackUsername() != null && games.get(i).whiteUsername() != null){
-                    throw new DataAccessException("all player spots are taken");
-                }
-                else if(games.get(i).blackUsername() == null && teamcolor == ChessGame.TeamColor.BLACK){
-                    GameData newName = games.get(i).addBlackUsername(playerName);
-                    games.set(i, newName);
-                    return newName;
-                }
-                else if(games.get(i).whiteUsername() == null && teamcolor == ChessGame.TeamColor.WHITE){
-                    GameData newName = games.get(i).addWhiteUsername(playerName);
-                    games.set(i, newName);
-                    return newName;
+    public boolean verifyBlackPosition(int gameID) {
+        for (GameData game : games) {
+            if (gameID == game.gameID()) {
+                if (game.blackUsername() == null)  {
+                    return true;
                 }
             }
         }
-        throw new DataAccessException("game does not exist");
+        return false;
+    }
+
+    public boolean verifyWhitePosition(int gameID){
+        for (GameData game : games) {
+            if (gameID == game.gameID()) {
+                if (game.whiteUsername() == null) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void insertUsername(int gameID, String newUsername, ChessGame.TeamColor color){
+        for(int i = 0; i < games.size(); i++){
+            if(gameID == games.get(i).gameID()){
+                if(color == ChessGame.TeamColor.WHITE){
+                    GameData tempGame = games.get(i);
+                    tempGame = tempGame.addWhiteUsername(newUsername);
+                    games.set(i, tempGame);
+                }
+                if(color == ChessGame.TeamColor.BLACK){
+                    GameData tempGame = games.get(i);
+                    tempGame = tempGame.addBlackUsername(newUsername);
+                    games.set(i, tempGame);
+                }
+            }
+        }
     }
 
     @Override

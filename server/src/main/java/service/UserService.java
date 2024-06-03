@@ -6,7 +6,7 @@ import dataAccess.MemoryAuthDAO;
 import dataAccess.MemoryUserDAO;
 import model.AuthData;
 import request.LoginRequest;
-import results.LogoutResults;
+import results.LogoutAndJoinResults;
 import results.RegisterResults;
 import spark.Response;
 
@@ -40,9 +40,9 @@ public class UserService {
 
         return regResults;
     }
-    public LogoutResults logout(AuthData auth, Response response) throws DataAccessException {
+    public LogoutAndJoinResults logout(AuthData auth, Response response) throws DataAccessException {
         var serializer = new Gson();
-        LogoutResults logoutResult = new LogoutResults(null);
+        LogoutAndJoinResults logoutResult = new LogoutAndJoinResults(null);
         if(!AUTH_DB.verifyUserAuth(auth)){
             logoutResult = logoutResult.setMessage("Error: unauthorized");
             response.status(401);

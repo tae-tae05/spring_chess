@@ -8,4 +8,7 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
     public GameData addBlackUsername(String newBlack){
         return new GameData(gameID, whiteUsername, newBlack, gameName, game);
     }
+    public GameData setGameID(int newGameID){
+        return new GameData(newGameID, whiteUsername, blackUsername, gameName, game);
+    }
 }

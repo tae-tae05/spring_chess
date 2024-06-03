@@ -9,11 +9,14 @@ import java.util.Collection;
 import java.util.List;
 
 public interface GameDAO {
-    List<GameData> games = new ArrayList<GameData>();
+    List<GameData> games = new ArrayList<>();
     void addGame(GameData game) throws DataAccessException;
 //    GameData getGame(GameData game) throws DataAccessException;
     void updateGames(GameData newGame) throws DataAccessException;
     Collection<GameData> listGames();
-    GameData verifyGamePosition(int gameID, ChessGame.TeamColor teamcolor, String playerName) throws DataAccessException;
+
+    boolean verifyWhitePosition(int gameID);
+    boolean verifyBlackPosition(int gameID);
     void deleteGames();
+    void insertUsername(int gameID, String newUsername, ChessGame.TeamColor color);
 }
