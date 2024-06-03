@@ -11,7 +11,7 @@ public interface AuthDAO {
     List<AuthData> auths = new ArrayList<>();
     void createAuth(AuthData auth);
     boolean verifyUserAuth(AuthData auth);
-    void deleteAuth(AuthData auth) throws DataAccessException;
+    AuthData deleteAuth(AuthData auth) throws DataAccessException;
     void clear();
     Collection<AuthData> getAuths();
 }

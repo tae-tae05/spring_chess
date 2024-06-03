@@ -18,7 +18,7 @@ public class LoginHandler implements Route{
         LoginRequest loginRequest = serializer.fromJson(request.body(), LoginRequest.class);
         response.type("application/json");
         RegisterResults loginResults = loginService.login(loginRequest, response);
-
-        return null;
+//        System.out.println(loginResults.toString());
+        return serializer.toJson(loginResults);
     }
 }

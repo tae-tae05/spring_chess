@@ -1,13 +1,11 @@
 package server;
 
 import handlers.*;
-import model.GameData;
 import model.UserData;
 import spark.*;
 
 import java.util.ArrayList;
 
-import static spark.Spark.get;
 
 public class Server {
     private ArrayList<UserData> users = new ArrayList<>();
@@ -23,8 +21,8 @@ public class Server {
         Spark.post("/user", new RegisterHandler());
         Spark.delete("/db", new ClearHandlers());
         Spark.post("/session", new LoginHandler());
-//        Spark.delete("/session", new LogoutHandler());
-//        Spark.get("/game", new ListGamesHandler());
+        Spark.delete("/session", new LogoutHandler());
+        Spark.get("/game", new ListGamesHandler());
 //        Spark.post("/game", new CreateGameHandler());
 //        Spark.put("/game", new JoinGameHandler());
         Spark.awaitInitialization();

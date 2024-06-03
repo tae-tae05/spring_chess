@@ -34,11 +34,12 @@ public class AuthDAOTests {
     @Test
     public void clearOneAuth() throws DataAccessException{
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
+
         authDAO.createAuth(new AuthData("tae", "efes2"));
         authDAO.createAuth(new AuthData("lee", "ikj4s"));
-
         AuthData toClear = new AuthData("lee", "ikj4s");
         authDAO.deleteAuth(toClear);
+
         List<AuthData> compare = new ArrayList<>();
         compare.add(new AuthData("tae", "efes2"));
 

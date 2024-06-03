@@ -16,19 +16,28 @@ public class MemoryAuthDAO implements AuthDAO{
 
     @Override
     public boolean verifyUserAuth(AuthData auth) {
-        return auths.contains(auth);
+        for(AuthData current: auths){
+            if(current.authToken().equals(auth.authToken())){
+                return true;
+            }
+        }
+        return false;
     }
     @Override
-    public void deleteAuth(AuthData auth) throws DataAccessException{
+    public AuthData deleteAuth(AuthData auth) throws DataAccessException{
+        AuthData remove = new AuthData(null, null);
         if(!verifyUserAuth(auth)){
             throw new DataAccessException("not in database");
         }
         for (int i = 0; i < auths.size(); i++) {
-            if (auths.get(i).equals(auth)) {
+            String authToken = auths.get(i).authToken();
+            if (authToken.equals(auth.authToken())) {
+                remove = auths.get(i);
                 auths.remove(i);
                 break;
             }
         }
+        return remove;
     }
 
     @Override

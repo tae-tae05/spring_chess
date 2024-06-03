@@ -2,6 +2,7 @@ package dataAccess;
 
 import model.UserData;
 
+import javax.xml.crypto.Data;
 import java.util.Collection;
 
 public class MemoryUserDAO implements UserDAO{
@@ -16,15 +17,16 @@ public class MemoryUserDAO implements UserDAO{
         return false;
         //returns false if it does not exist
     }
-    public boolean checkUser(String username, String password){
-        for(UserData current: users){
-            if(current.username().equals(username) && current.password().equals(password)){
+    public boolean checkUser(String username, String password) throws DataAccessException{
+        for(UserData current: users) {
+            if (current.username().equals(username) && current.password().equals(password)) {
                 return true;
-                //returns true if it exists
             }
         }
         return false;
     }
+
+
     @Override
     public void createUser(UserData user) throws DataAccessException{
         if(getUser(user)) {
@@ -32,6 +34,8 @@ public class MemoryUserDAO implements UserDAO{
         }
         users.add(user);
     }
+
+
     @Override
     public void deleteUsers() {
         users.clear();
