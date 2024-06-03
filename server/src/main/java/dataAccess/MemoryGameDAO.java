@@ -5,6 +5,7 @@ import model.GameData;
 
 import javax.xml.crypto.Data;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public class MemoryGameDAO implements GameDAO{
@@ -43,7 +44,7 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public Collection<GameData> listGames() {
+    public List<GameData> listGames() {
         return games;
     }
 
