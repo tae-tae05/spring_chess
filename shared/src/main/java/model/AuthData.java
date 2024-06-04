@@ -16,4 +16,4 @@ package model;
 //        return USERNAME;
 //    }
 //}
-record AuthData(String authToken, String Username) {}
+public record AuthData(String authToken, String Username) {}
