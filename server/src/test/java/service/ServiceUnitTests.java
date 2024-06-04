@@ -109,7 +109,7 @@ class ServiceUnitTests {
     @Order(4)
     @DisplayName("Logout Success")
     public void logoutSuccess() throws DataAccessException{
-        AuthData auth = userService.AUTH_DB.getAuth(existingUser.getUsername());
+        AuthData auth = userService.AUTH_DAO.getAuth(existingUser.getUsername());
 
         LogoutAndJoinResults logoutResult = userService.logout(auth, response);
 
@@ -155,7 +155,7 @@ class ServiceUnitTests {
     @Order(7)
     @DisplayName("Create Game Success")
     public void createGameSuccess() throws DataAccessException{
-        AuthData auth = userService.AUTH_DB.getAuth(existingUser.getUsername());
+        AuthData auth = userService.AUTH_DAO.getAuth(existingUser.getUsername());
         CreateGameResults gameResults = gameService.createGame(gameOne, auth, response);
 
         Assertions.assertNull(gameResults.getMessage(), "did not create game succesfully");
@@ -175,7 +175,7 @@ class ServiceUnitTests {
     @Order(8)
     @DisplayName("List Games Success")
     public void listGames() throws DataAccessException{
-        AuthData auth = userService.AUTH_DB.getAuth(existingUser.getUsername());
+        AuthData auth = userService.AUTH_DAO.getAuth(existingUser.getUsername());
         ListGameResults results = gameService.listGames(auth, response);
 
         Assertions.assertNull(results.message(), "games were not returned");
@@ -195,7 +195,7 @@ class ServiceUnitTests {
     @Order(10)
     @DisplayName("Join Game Success")
     public void joinedGame() throws DataAccessException{
-        AuthData auth = userService.AUTH_DB.getAuth(existingUser.getUsername());
+        AuthData auth = userService.AUTH_DAO.getAuth(existingUser.getUsername());
         GameData game = new GameData(null, null, null, "my game", new ChessGame());
         CreateGameResults temp = gameService.createGame(game, auth, response);
         JoinGameRequest joinRequest = new JoinGameRequest(temp.getGameID(), ChessGame.TeamColor.WHITE);
@@ -210,7 +210,7 @@ class ServiceUnitTests {
     @DisplayName("Join Game Failure")
     public void failedJoiningGame() throws DataAccessException{
 
-        AuthData auth = userService.AUTH_DB.getAuth(existingUser.getUsername());
+        AuthData auth = userService.AUTH_DAO.getAuth(existingUser.getUsername());
         GameData game = new GameData(null, "Jin", null, "my game", new ChessGame());
         CreateGameResults temp = gameService.createGame(game, auth, response);
         JoinGameRequest joinRequest = new JoinGameRequest(temp.getGameID(), ChessGame.TeamColor.WHITE);
