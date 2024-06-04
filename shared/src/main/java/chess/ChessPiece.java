@@ -1,7 +1,7 @@
 package chess;
 
 
-import chess.Moves.*;
+import chess.moves.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,12 +14,12 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private final ChessGame.TeamColor COLOR;
-    private final PieceType PIECE;
+    private final ChessGame.TeamColor color;
+    private final PieceType piece;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        this.COLOR = pieceColor;
-        this.PIECE = type;
+        this.color = pieceColor;
+        this.piece = type;
     }
 
     /**
@@ -38,14 +38,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return COLOR;
+        return color;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return PIECE;
+        return piece;
     }
 
     /**
@@ -59,35 +59,35 @@ public class ChessPiece {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
         Collection<ChessMove> moves = new ArrayList<>();
-        switch (PIECE) {
+        switch (piece) {
             case PieceType.BISHOP -> {
                 BishopMoves bishop = new BishopMoves();
-                moves = bishop.pieceMoves(board, myPosition, COLOR);
+                moves = bishop.pieceMoves(board, myPosition, color);
             }
             case PieceType.KING ->
             {
                 KingMoves king = new KingMoves();
-                moves = king.pieceMoves(board, myPosition, COLOR);
+                moves = king.pieceMoves(board, myPosition, color);
             }
             case PieceType.KNIGHT ->
             {
                 KnightMoves knight = new KnightMoves();
-                moves = knight.pieceMoves(board, myPosition, COLOR);
+                moves = knight.pieceMoves(board, myPosition, color);
             }
             case PieceType.PAWN ->
             {
                 PawnMoves pawn = new PawnMoves();
-                moves = pawn.pieceMoves(board, myPosition, COLOR);
+                moves = pawn.pieceMoves(board, myPosition, color);
             }
             case PieceType.QUEEN ->
             {
                 QueenMoves queen = new QueenMoves();
-                moves = queen.pieceMoves(board, myPosition, COLOR);
+                moves = queen.pieceMoves(board, myPosition, color);
             }
             case PieceType.ROOK ->
             {
                 RookMoves rook = new RookMoves();
-                moves = rook.pieceMoves(board, myPosition, COLOR);
+                moves = rook.pieceMoves(board, myPosition, color);
             }
             default ->
             {
@@ -102,11 +102,11 @@ public class ChessPiece {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessPiece that = (ChessPiece) o;
-        return COLOR == that.COLOR && PIECE == that.PIECE;
+        return color == that.color && piece == that.piece;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(COLOR, PIECE);
+        return Objects.hash(color, piece);
     }
 }

@@ -12,12 +12,12 @@ import spark.Route;
 import java.net.NoRouteToHostException;
 
 public class ClearHandlers implements Route {
-    ClearService CLEAR_SERVICE = new ClearService();
+    ClearService clearService = new ClearService();
     @Override
     public Object handle(Request request, Response response) throws Exception {
         var serializer = new Gson();
         response.type("application/json");
-        ClearResults clearUsers = CLEAR_SERVICE.clearAll(response);
+        ClearResults clearUsers = clearService.clearAll(response);
         return serializer.toJson(clearUsers);
     }
 }

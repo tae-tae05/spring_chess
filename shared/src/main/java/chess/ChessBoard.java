@@ -9,7 +9,7 @@ import java.util.Arrays;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] BOARD = new ChessPiece[8][8];
+    private ChessPiece[][] board = new ChessPiece[8][8];
     public ChessBoard() {
     }
 
@@ -20,14 +20,14 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        BOARD[position.getRow()-1][position.getColumn()-1] = piece;
+        board[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
     public ChessPosition findPiece(ChessPiece piece) {
         int r = 1;
         int c = 1;
         boolean found = false;
-        for (ChessPiece[] row : BOARD) {
+        for (ChessPiece[] row : board) {
             c = 1;
             for (ChessPiece tempPiece : row) {
                 if (piece.equals(tempPiece)) {
@@ -43,22 +43,18 @@ public class ChessBoard {
     public void movePiece(ChessMove move) {
         ChessPiece current = getPiece(move.getStartPosition());
         ChessPiece.PieceType upgrade = move.getPromotionPiece();
-        BOARD[move.getStartPosition().getRow()-1][move.getStartPosition().getColumn() - 1] = null;
+        board[move.getStartPosition().getRow()-1][move.getStartPosition().getColumn() - 1] = null;
         int r = move.getEndPosition().getRow();
         int c = move.getEndPosition().getColumn();
         if(upgrade == null) {
-            BOARD[r-1][c-1] = current;
+            board[r-1][c-1] = current;
         }
         else{
-            BOARD[r-1][c-1] = new ChessPiece(current.getTeamColor(), upgrade);
+            board[r-1][c-1] = new ChessPiece(current.getTeamColor(), upgrade);
         }
     }
-
-    public void removePiece(ChessPosition position){
-        BOARD[position.getRow()-1][position.getColumn()-1] = null;
-    }
     public ChessPiece getPiece(ChessPosition position) {
-        return BOARD[position.getRow()-1][position.getColumn()-1];
+        return board[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
@@ -91,11 +87,7 @@ public class ChessBoard {
         squares[0][3] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
         squares[7][4] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
         squares[7][3] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
-        this.BOARD = squares;
-    }
-    //for testing purposes
-    public void emptyBoard(){
-        this.BOARD = new ChessPiece[8][8];
+        this.board = squares;
     }
 
     @Override
@@ -103,19 +95,19 @@ public class ChessBoard {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessBoard that = (ChessBoard) o;
-        return Arrays.deepEquals(BOARD, that.BOARD);
+        return Arrays.deepEquals(board, that.board);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(BOARD);
+        return Arrays.deepHashCode(board);
     }
 
     @Override
     public String toString() {
         String chessboard = "";
         for(int i = 7; i > -1; i--){
-            ChessPiece[] row = BOARD[i];
+            ChessPiece[] row = board[i];
             chessboard += "|";
             for(int j = 0; j < 8; j++){
                 ChessPiece piece = row[j];

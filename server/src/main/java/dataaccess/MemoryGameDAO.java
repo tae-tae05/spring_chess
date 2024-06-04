@@ -1,26 +1,23 @@
-package dataAccess;
+package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
 
-import javax.xml.crypto.Data;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 public class MemoryGameDAO implements GameDAO{
 
     @Override
     public void addGame(GameData game) throws DataAccessException {
-        if(games.contains(game)){
+        if(GAMES.contains(game)){
             throw new DataAccessException("game already exists");
         }
-        games.add(game);
+        GAMES.add(game);
     }
 
     @Override
     public boolean verifyBlackPosition(int gameID) {
-        for (GameData game : games) {
+        for (GameData game : GAMES) {
             if (gameID == game.gameID()) {
                 if (game.blackUsername() == null)  {
                     return true;
@@ -31,7 +28,7 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     public boolean verifyWhitePosition(int gameID){
-        for (GameData game : games) {
+        for (GameData game : GAMES) {
             if (gameID == game.gameID()) {
                 if (game.whiteUsername() == null) {
                     return true;
@@ -42,7 +39,7 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     public boolean verifyGame(int gameID){
-        for (GameData game : games) {
+        for (GameData game : GAMES) {
             if (gameID == game.gameID()) {
                 return true;
             }
@@ -50,28 +47,18 @@ public class MemoryGameDAO implements GameDAO{
         return false;
     }
 
-    public GameData getGame(int gameID){
-        for(GameData game: games){
-            if (game.gameID() == gameID){
-                return game;
-            }
-        }
-        return null;
-    }
-
-
     public void insertUsername(int gameID, String newUsername, ChessGame.TeamColor color){
-        for(int i = 0; i < games.size(); i++){
-            if(gameID == games.get(i).gameID()){
+        for(int i = 0; i < GAMES.size(); i++){
+            if(gameID == GAMES.get(i).gameID()){
                 if(color == ChessGame.TeamColor.WHITE){
-                    GameData tempGame = games.get(i);
+                    GameData tempGame = GAMES.get(i);
                     tempGame = tempGame.addWhiteUsername(newUsername);
-                    games.set(i, tempGame);
+                    GAMES.set(i, tempGame);
                 }
                 if(color == ChessGame.TeamColor.BLACK){
-                    GameData tempGame = games.get(i);
+                    GameData tempGame = GAMES.get(i);
                     tempGame = tempGame.addBlackUsername(newUsername);
-                    games.set(i, tempGame);
+                    GAMES.set(i, tempGame);
                 }
             }
         }
@@ -79,28 +66,12 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     public List<GameData> listGames() {
-        return games;
+        return GAMES;
     }
 
-    @Override
-    public void updateGames(GameData newGame) throws DataAccessException{
-        int counter = 0;
-        boolean exists = false;
-        for(int i = 0; i < games.size(); i++) {
-            if(games.get(i).gameID() == newGame.gameID()){
-                exists = true;
-                counter = i;
-                break;
-            }
-        }
-        if(!exists){
-            throw new DataAccessException("game does not exist");
-        }
-        games.set(counter, newGame);
-    }
 
     @Override
     public void deleteGames() {
-        games.clear();
+        GAMES.clear();
     }
 }

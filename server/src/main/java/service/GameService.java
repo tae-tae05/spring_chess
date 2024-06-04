@@ -1,9 +1,9 @@
 package service;
 
 import chess.ChessGame;
-import dataAccess.DataAccessException;
-import dataAccess.MemoryAuthDAO;
-import dataAccess.MemoryGameDAO;
+import dataaccess.DataAccessException;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
 import model.AuthData;
 import model.GameData;
 import request.JoinGameRequest;
@@ -13,12 +13,12 @@ import spark.Response;
 import java.util.Random;
 
 public class GameService {
-    private MemoryGameDAO GAMES_DAO = new MemoryGameDAO();
-    private MemoryAuthDAO AUTH_DAO = new MemoryAuthDAO();
+    private MemoryGameDAO gameDAO = new MemoryGameDAO();
+    private MemoryAuthDAO authDAO = new MemoryAuthDAO();
 
     public CreateGameResults createGame(GameData game, AuthData auth, Response response) throws DataAccessException {
         CreateGameResults results = new CreateGameResults();
-        if(!AUTH_DAO.verifyUserAuth(auth)){
+        if(!authDAO.verifyUserAuth(auth)){
             results.setMessage("Error: unauthorized");
             response.status(401);
             return results;
@@ -32,7 +32,7 @@ public class GameService {
             Random rand = new Random();
             int tempGameID = rand.nextInt((1000) + 1);
             game = game.setGameID(tempGameID);
-            GAMES_DAO.addGame(game);
+            gameDAO.addGame(game);
             results.setGameID(game.gameID());
         }
         catch(Exception e){
@@ -43,29 +43,29 @@ public class GameService {
     }
     public LogoutAndJoinResults joinGame(JoinGameRequest join, AuthData auth, Response response) throws DataAccessException {
         LogoutAndJoinResults results = new LogoutAndJoinResults(null);
-        if(!AUTH_DAO.verifyUserAuth(auth)){
+        if(!authDAO.verifyUserAuth(auth)){
             results = results.setMessage("Error: unauthorized");
             response.status(401);
             return results;
         }
-        if(join.getTeamColor() == null || join.getGameID() == null || !GAMES_DAO.verifyGame(join.getGameID())){
+        if(join.getTeamColor() == null || join.getGameID() == null || !gameDAO.verifyGame(join.getGameID())){
             results = results.setMessage("Error: bad request");
             response.status(400);
             return results;
         }
-        if(join.getTeamColor() == ChessGame.TeamColor.BLACK && !GAMES_DAO.verifyBlackPosition(join.getGameID())){
+        if(join.getTeamColor() == ChessGame.TeamColor.BLACK && !gameDAO.verifyBlackPosition(join.getGameID())){
             results = results.setMessage("Error: already taken");
             response.status(403);
             return results;
         }
-        if(join.getTeamColor() == ChessGame.TeamColor.WHITE && !GAMES_DAO.verifyWhitePosition(join.getGameID())){
+        if(join.getTeamColor() == ChessGame.TeamColor.WHITE && !gameDAO.verifyWhitePosition(join.getGameID())){
             results = results.setMessage("Error: already taken");
             response.status(403);
             return results;
         }
         try{
-            String username = AUTH_DAO.getUsername(auth);
-            GAMES_DAO.insertUsername(join.getGameID(), username, join.getTeamColor());
+            String username = authDAO.getUsername(auth);
+            gameDAO.insertUsername(join.getGameID(), username, join.getTeamColor());
             response.status(200);
         }
         catch(Exception e){
@@ -75,21 +75,15 @@ public class GameService {
         return results;
     }
 
-    public void printGames(){
-        for(GameData game : GAMES_DAO.listGames()){
-            System.out.println(game.toString());
-        }
-    }
-
     public ListGameResults listGames(AuthData auth, Response response){
         ListGameResults results = new ListGameResults(null, null);
-        if(!AUTH_DAO.verifyUserAuth(auth)){
+        if(!authDAO.verifyUserAuth(auth)){
             results = results.setMessage("Error: unauthorized");
             response.status(401);
             return results;
         }
         try{
-            results = results.setGames(GAMES_DAO.listGames());
+            results = results.setGames(gameDAO.listGames());
             response.status(200);
         }
         catch(Exception e){

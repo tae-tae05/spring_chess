@@ -1,8 +1,8 @@
 package service;
 
-import dataAccess.DataAccessException;
-import dataAccess.MemoryAuthDAO;
-import dataAccess.MemoryUserDAO;
+import dataaccess.DataAccessException;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryUserDAO;
 import model.AuthData;
 import model.UserData;
 import results.RegisterResults;
@@ -11,8 +11,8 @@ import spark.Response;
 import java.util.UUID;
 
 public class RegisterService {
-    MemoryUserDAO USERS_DAO = new MemoryUserDAO();
-    MemoryAuthDAO AUTH_DAO = new MemoryAuthDAO();
+    MemoryUserDAO userDAO = new MemoryUserDAO();
+    MemoryAuthDAO authDAO = new MemoryAuthDAO();
     public RegisterResults register(UserData user, Response response) throws DataAccessException {
 
         RegisterResults regResults = new RegisterResults(null,null,null);
@@ -21,15 +21,15 @@ public class RegisterService {
             response.status(400);
             return regResults;
         }
-        if(USERS_DAO.getUser(user)){
+        if(userDAO.getUser(user)){
             regResults = regResults.setMessage("Error: already taken");
             response.status(403);
             return regResults;
         }
         try{
-            USERS_DAO.createUser(user);
+            userDAO.createUser(user);
             AuthData one = new AuthData(UUID.randomUUID().toString(), user.username());
-            AUTH_DAO.createAuth(one);
+            authDAO.createAuth(one);
             regResults = regResults.setUsername(user.username());
             regResults = regResults.setAuthToken(one.authToken());
             response.status(200);

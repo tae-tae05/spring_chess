@@ -1,22 +1,18 @@
-package dataAccess;
+package dataaccess;
 
 import model.AuthData;
-import model.UserData;
 
-import javax.xml.crypto.Data;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class MemoryAuthDAO implements AuthDAO{
     @Override
     public void createAuth(AuthData auth) {
-        auths.add(auth);
+        AUTHS.add(auth);
     }
 
     @Override
     public boolean verifyUserAuth(AuthData auth) {
-        for(AuthData current: auths){
+        for(AuthData current: AUTHS){
             if(current.authToken().equals(auth.authToken())){
                 return true;
             }
@@ -29,11 +25,11 @@ public class MemoryAuthDAO implements AuthDAO{
         if(!verifyUserAuth(auth)){
             throw new DataAccessException("not in database");
         }
-        for (int i = 0; i < auths.size(); i++) {
-            String authToken = auths.get(i).authToken();
+        for (int i = 0; i < AUTHS.size(); i++) {
+            String authToken = AUTHS.get(i).authToken();
             if (authToken.equals(auth.authToken())) {
-                remove = auths.get(i);
-                auths.remove(i);
+                remove = AUTHS.get(i);
+                AUTHS.remove(i);
                 break;
             }
         }
@@ -42,26 +38,26 @@ public class MemoryAuthDAO implements AuthDAO{
 
     @Override
     public void clear() {
-        auths.clear();
+        AUTHS.clear();
     }
 
     @Override
     public Collection<AuthData> getAuths() {
-        return auths;
+        return AUTHS;
     }
 
     public String getUsername(AuthData auth){
-        for(AuthData temp: auths){
+        for(AuthData temp: AUTHS){
             if (temp.authToken().equals(auth.authToken())){
-                return temp.Username();
+                return temp.username();
             }
         }
         return null;
     }
 
     public AuthData getAuth(String username){
-        for(AuthData temp: auths){
-            if(temp.Username().equals(username)){
+        for(AuthData temp: AUTHS){
+            if(temp.username().equals(username)){
                 return temp;
             }
         }
