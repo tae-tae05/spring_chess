@@ -26,6 +26,8 @@ public class Server {
         Spark.post("/game", new CreateGameHandler());
         Spark.put("/game", new JoinGameHandler());
 
+
+
         Spark.awaitInitialization();
         return Spark.port();
     }
@@ -33,5 +35,11 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
+    }
+
+    public static void main(String[] args) {
+        var server = new Server();
+
+        server.run(8080);
     }
 }

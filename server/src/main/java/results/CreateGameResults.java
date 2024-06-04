@@ -18,4 +18,12 @@ public class CreateGameResults {
     public void setGameID(int newGameID){
         gameID = newGameID;
     }
+
+    public int getGameID(){
+        return gameID;
+    }
+
+    public String getMessage(){
+        return message;
+    }
 }

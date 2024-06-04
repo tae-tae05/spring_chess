@@ -1,20 +1,21 @@
 package request;
 
 import chess.ChessGame;
+import chess.ChessPosition;
 
 public class JoinGameRequest{
     private Integer gameID;
-    private String color;
+    private ChessGame.TeamColor playerColor;
 
     public JoinGameRequest(){
     }
 
-    public JoinGameRequest(int gameID, String color){
+    public JoinGameRequest(int gameID, ChessGame.TeamColor playerColor){
         this.gameID = gameID;
-        this.color = color;
+        this.playerColor = playerColor;
     }
 
-    public int getGameID(){
+    public Integer getGameID(){
         return gameID;
     }
 
@@ -22,11 +23,11 @@ public class JoinGameRequest{
     public String toString() {
         return "JoinGameRequest{" +
                 "gameID=" + gameID +
-                ", color=" + color +
+                ", color=" + playerColor +
                 '}';
     }
 
-    public String getTeamColor(){
-        return color;
+    public ChessGame.TeamColor getTeamColor(){
+        return playerColor;
     }
 }

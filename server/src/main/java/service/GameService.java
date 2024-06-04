@@ -43,35 +43,29 @@ public class GameService {
     }
     public LogoutAndJoinResults joinGame(JoinGameRequest join, AuthData auth, Response response) throws DataAccessException {
         LogoutAndJoinResults results = new LogoutAndJoinResults(null);
-        System.out.println(join.toString());
         if(!AUTH_DB.verifyUserAuth(auth)){
             results = results.setMessage("Error: unauthorized");
             response.status(401);
             return results;
         }
-        if(join.getTeamColor() == null){
+        if(join.getTeamColor() == null || join.getGameID() == null || !GAMES_DB.verifyGame(join.getGameID())){
             results = results.setMessage("Error: bad request");
             response.status(400);
             return results;
         }
-//        if(join.getTeamColor() == ChessGame.TeamColor.BLACK && GAMES_DB.verifyBlackPosition(join.getGameID()))
-        if(join.getTeamColor().equals("BLACK") && GAMES_DB.verifyBlackPosition(join.getGameID())){
+        if(join.getTeamColor() == ChessGame.TeamColor.BLACK && !GAMES_DB.verifyBlackPosition(join.getGameID())){
             results = results.setMessage("Error: already taken");
             response.status(403);
             return results;
         }
-        if(join.getTeamColor().equals("WHITE") && GAMES_DB.verifyWhitePosition(join.getGameID())){
+        if(join.getTeamColor() == ChessGame.TeamColor.WHITE && !GAMES_DB.verifyWhitePosition(join.getGameID())){
             results = results.setMessage("Error: already taken");
-            response.status(400);
+            response.status(403);
             return results;
         }
         try{
-            if(join.getTeamColor().equals("BLACK")){
-                GAMES_DB.insertUsername(join.getGameID(), auth.Username(), ChessGame.TeamColor.BLACK);
-            }
-            else{
-                GAMES_DB.insertUsername(join.getGameID(), auth.Username(), ChessGame.TeamColor.WHITE);
-            }
+            String username = AUTH_DB.getUsername(auth);
+            GAMES_DB.insertUsername(join.getGameID(), username, join.getTeamColor());
             response.status(200);
         }
         catch(Exception e){
@@ -79,6 +73,12 @@ public class GameService {
             response.status(500);
         }
         return results;
+    }
+
+    public void printGames(){
+        for(GameData game : GAMES_DB.listGames()){
+            System.out.println(game.toString());
+        }
     }
 
     public ListGameResults listGames(AuthData auth, Response response){
@@ -98,4 +98,5 @@ public class GameService {
         }
         return results;
     }
+
 }

@@ -16,6 +16,7 @@ public class UserService {
     MemoryUserDAO USERS_DB = new MemoryUserDAO();
     MemoryAuthDAO AUTH_DB = new MemoryAuthDAO();
 
+
     public RegisterResults login(LoginRequest loginRequest, Response response) throws DataAccessException{
         var serializer = new Gson();
         RegisterResults regResults = new RegisterResults(null, null, null);

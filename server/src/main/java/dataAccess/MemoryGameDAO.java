@@ -19,7 +19,6 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    //adds a player after confirming game exists
     public boolean verifyBlackPosition(int gameID) {
         for (GameData game : games) {
             if (gameID == game.gameID()) {
@@ -41,6 +40,25 @@ public class MemoryGameDAO implements GameDAO{
         }
         return false;
     }
+
+    public boolean verifyGame(int gameID){
+        for (GameData game : games) {
+            if (gameID == game.gameID()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public GameData getGame(int gameID){
+        for(GameData game: games){
+            if (game.gameID() == gameID){
+                return game;
+            }
+        }
+        return null;
+    }
+
 
     public void insertUsername(int gameID, String newUsername, ChessGame.TeamColor color){
         for(int i = 0; i < games.size(); i++){
@@ -65,7 +83,6 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-
     public void updateGames(GameData newGame) throws DataAccessException{
         int counter = 0;
         boolean exists = false;

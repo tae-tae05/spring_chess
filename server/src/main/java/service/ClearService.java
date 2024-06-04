@@ -10,6 +10,9 @@ public class ClearService {
     private MemoryUserDAO USERS_DB = new MemoryUserDAO();
     private MemoryAuthDAO AUTH_DB = new MemoryAuthDAO();
     private MemoryGameDAO GAMES_DB = new MemoryGameDAO();
+
+
+
     public ClearResults clearAll(Response response){
         ClearResults clearResult = new ClearResults(null);
         try {
