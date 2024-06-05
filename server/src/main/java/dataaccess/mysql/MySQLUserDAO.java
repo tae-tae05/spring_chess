@@ -19,8 +19,19 @@ import java.util.Collection;
 public class MySQLUserDAO implements UserDAO {
     private static String SALT = BCrypt.gensalt();
     @Override
-    public boolean getUser(UserData user) {
-        return false;
+    public boolean getUser(UserData user) throws DataAccessException, SQLException {
+        String find = user.username();
+        String sql = "SELECT username FROM user WHERE username= '" + user.username() + "'";
+        try{
+            var connection = DatabaseManager.getConnection();
+            var pst = connection.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            return rs.next();
+        }
+        catch(SQLException e){
+            throw new DataAccessException(e.getMessage());
+        }
+
     }
 
     @Override
@@ -32,8 +43,8 @@ public class MySQLUserDAO implements UserDAO {
     public void createUser(UserData user) throws DataAccessException, SQLException {
         String hashPassword = BCrypt.hashpw(user.password(), SALT);
         String sql = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        Connection connection = DatabaseManager.getConnection();
-        PreparedStatement pst = connection.prepareStatement(sql);
+        var connection = DatabaseManager.getConnection();
+        var pst = connection.prepareStatement(sql);
         pst.setString(1,user.username());
         pst.setString(2, hashPassword);
         pst.setString(3, user.email());
@@ -43,8 +54,9 @@ public class MySQLUserDAO implements UserDAO {
     @Override
     public void deleteUsers() throws DataAccessException, SQLException {
         String sql = "TRUNCATE TABLE user";
-        Connection connection = DatabaseManager.getConnection();
-        PreparedStatement pst = connection.prepareStatement(sql);
+        var connection = DatabaseManager.getConnection();
+        connection.setCatalog("chess");
+        var pst = connection.prepareStatement(sql);
         int result = pst.executeUpdate();
     }
 

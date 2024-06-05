@@ -3,9 +3,11 @@ package dataaccess;
 import model.UserData;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class MemoryUserDAO implements UserDAO{
+    public Collection<UserData> USERS = new ArrayList<>();
     @Override
     public boolean getUser(UserData user) {
         for(UserData current: USERS){
