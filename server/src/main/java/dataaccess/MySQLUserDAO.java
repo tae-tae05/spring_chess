@@ -1,4 +1,4 @@
-package dataaccess.mysql;
+package dataaccess;
 
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
@@ -55,7 +55,6 @@ public class MySQLUserDAO implements UserDAO {
     public void deleteUsers() throws DataAccessException, SQLException {
         String sql = "TRUNCATE TABLE user";
         var connection = DatabaseManager.getConnection();
-        connection.setCatalog("chess");
         var pst = connection.prepareStatement(sql);
         int result = pst.executeUpdate();
     }

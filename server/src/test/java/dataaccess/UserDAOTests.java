@@ -1,17 +1,11 @@
 package dataaccess;
 
-import dataaccess.mysql.MySQLUserDAO;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mindrot.jbcrypt.BCrypt;
 import passoff.model.TestUser;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class UserDAOTests {
@@ -59,7 +53,6 @@ public class UserDAOTests {
     public void addUser() throws SQLException, DataAccessException {
         var connection = DatabaseManager.getConnection();
         userDAO.createUser(one);
-        connection.setCatalog("chess");
 
         String getOne = """
                 SELECT username FROM user WHERE username =?
