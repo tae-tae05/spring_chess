@@ -3,6 +3,9 @@ package service;
 import chess.ChessGame;
 import dataaccess.*;
 
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
+import dataaccess.MemoryUserDAO;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -55,8 +58,6 @@ class ServiceUnitTests {
         existingUser = new TestUser("ExistingUser", "existingUserPassword", "eu@mail.com");
 
         newUser = new TestUser("NewUser", "newUserPassword", "nu@mail.com");
-//
-//        createRequest = new TestCreateRequest("testGame");
     }
 
     @BeforeEach

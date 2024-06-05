@@ -9,7 +9,6 @@
         <module name="client" />
         <module name="server" />
         <module name="shared" />
-        <module name="spring_chess" />
       </profile>
     </annotationProcessing>
   </component>

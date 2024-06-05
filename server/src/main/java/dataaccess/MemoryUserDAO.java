@@ -2,6 +2,7 @@ package dataaccess;
 
 import model.UserData;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 public class MemoryUserDAO implements UserDAO{
@@ -36,7 +37,7 @@ public class MemoryUserDAO implements UserDAO{
 
 
     @Override
-    public void deleteUsers() {
+    public void deleteUsers() throws DataAccessException, SQLException {
         USERS.clear();
     }
 

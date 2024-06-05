@@ -1,10 +1,12 @@
 package dataaccess;
 
+import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import model.AuthData;
 
 import java.util.Collection;
 
-public class MemoryAuthDAO implements AuthDAO{
+public class MemoryAuthDAO implements AuthDAO {
     @Override
     public void createAuth(AuthData auth) {
         AUTHS.add(auth);
@@ -20,7 +22,7 @@ public class MemoryAuthDAO implements AuthDAO{
         return false;
     }
     @Override
-    public AuthData deleteAuth(AuthData auth) throws DataAccessException{
+    public AuthData deleteAuth(AuthData auth) throws DataAccessException {
         AuthData remove = new AuthData(null, null);
         if(!verifyUserAuth(auth)){
             throw new DataAccessException("not in database");
