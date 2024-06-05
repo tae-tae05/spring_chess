@@ -21,9 +21,9 @@ public class UserDAOTests {
     private final UserData one = new UserData("jin", "taetae", "jin@gmail.com");
     private final UserData two = new UserData("jj", "arayofj", "jj@gmail.com");
 
-    static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "mysqlNBZIEN12!");
-    }
+//    static Connection getConnection() throws SQLException {
+//        return DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "mysqlNBZIEN12!");
+//    }
 
     @BeforeEach
     public void setUp() throws SQLException, DataAccessException {
