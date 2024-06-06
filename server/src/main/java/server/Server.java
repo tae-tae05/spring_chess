@@ -1,37 +1,44 @@
 package server;
 
+import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
+import dataaccess.memory.MemoryDataAccess;
+import dataaccess.sql.MySQLDAO;
+import dataaccess.sql.MySQLDataAccess;
 import handlers.*;
 import model.UserData;
 import spark.*;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import static dataaccess.DatabaseManager.createDatabase;
-
 
 public class Server {
-    private ArrayList<UserData> users = new ArrayList<>();
-    private ArrayList<UserData> auths = new ArrayList<>();
-    private ArrayList<UserData> games = new ArrayList<>();
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
 
+        DataAccess data;
+        try{
+            data = new MySQLDataAccess();
+        }
+        catch(DataAccessException | SQLException e){
+            throw new RuntimeException(e.getMessage());
+        }
+
         // Register your endpoints and handle exceptions here.
-        Spark.post("/user", new RegisterHandler());
-        Spark.delete("/db", new ClearHandlers());
-        Spark.post("/session", new LoginHandler());
-        Spark.delete("/session", new LogoutHandler());
-        Spark.get("/game", new ListGamesHandler());
-        Spark.post("/game", new CreateGameHandler());
-        Spark.put("/game", new JoinGameHandler());
+        Spark.post("/user", new RegisterHandler(data));
+        Spark.delete("/db", new ClearHandlers(data));
+        Spark.post("/session", new LoginHandler(data));
+        Spark.delete("/session", new LogoutHandler(data));
+        Spark.get("/game", new ListGamesHandler(data));
+        Spark.post("/game", new CreateGameHandler(data));
+        Spark.put("/game", new JoinGameHandler(data));
 
 
 
@@ -46,12 +53,55 @@ public class Server {
 
     public static void main(String[] args) {
         var server = new Server();
-        try{
-            createDatabase();
-        }
-        catch(DataAccessException e){
-            throw new RuntimeException(e.getMessage());
+        try {
+            System.out.println("Here");
+            configureDatabase();
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
         }
         server.run(8080);
+    }
+
+    public static void configureDatabase() throws DataAccessException, SQLException {
+
+        DatabaseManager.createDatabase();
+        try(var connection = DatabaseManager.getConnection()) {
+            var userTable = """
+                        CREATE TABLE IF NOT EXISTS user (
+                        username VARCHAR(64) NOT NULL,
+                        password VARCHAR(64) NOT NULL,
+                        email VARCHAR(64) NOT NULL,
+                        PRIMARY KEY (username)
+                    )""";
+
+            try (var createTable = connection.prepareStatement(userTable)) {
+                createTable.executeUpdate();
+            }
+
+            var gameTable = """
+                    CREATE TABLE IF NOT EXISTS games (
+                    gameID int NOT NULL,
+                    gameData TEXT NOT NULL,
+                    PRIMARY KEY (gameID)
+                    )""";
+
+            try (var createTable = connection.prepareStatement(gameTable)) {
+                createTable.executeUpdate();
+            }
+
+            var authTable = """
+                    CREATE TABLE IF NOT EXISTS auths (
+                    authToken VARCHAR(64) NOT NULL,
+                    username VARCHAR(64) NOT NULL,
+                    PRIMARY KEY (authToken)
+                    )""";
+
+            try (var createTable = connection.prepareStatement(authTable)) {
+                createTable.executeUpdate();
+            }
+        } catch (DataAccessException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

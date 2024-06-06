@@ -1,24 +1,25 @@
 package service;
 
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.DataAccess;
+import dataaccess.memory.MemoryAuthDAO;
+import dataaccess.memory.MemoryGameDAO;
+import dataaccess.memory.MemoryUserDAO;
 import results.ClearResults;
 import spark.Response;
 
 public class ClearService {
-    private MemoryUserDAO userDAO = new MemoryUserDAO();
-    private MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    private MemoryGameDAO gamesDAO = new MemoryGameDAO();
-
+    private final DataAccess data;
+    public ClearService(DataAccess data){
+        this.data = data;
+    }
 
 
     public ClearResults clearAll(Response response){
         ClearResults clearResult = new ClearResults(null);
         try {
-            userDAO.deleteUsers();
-            authDAO.clear();
-            gamesDAO.deleteGames();
+            data.getUserDAO().deleteUsers();
+            data.getAuthDAO().clear();
+            data.getGameDAO().deleteGames();
             response.status(200);
         }
         catch(Exception e){

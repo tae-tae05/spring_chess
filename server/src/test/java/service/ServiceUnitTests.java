@@ -3,9 +3,10 @@ package service;
 import chess.ChessGame;
 import dataaccess.*;
 
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.memory.MemoryAuthDAO;
+import dataaccess.memory.MemoryDataAccess;
+import dataaccess.memory.MemoryGameDAO;
+import dataaccess.memory.MemoryUserDAO;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -16,18 +17,26 @@ import request.LoginRequest;
 import results.*;
 import spark.Response;
 
+import java.sql.SQLException;
+
 class ServiceUnitTests {
 
-    MemoryGameDAO testGame = new MemoryGameDAO();
-    MemoryAuthDAO testAuth = new MemoryAuthDAO();
-    MemoryUserDAO testUser = new MemoryUserDAO();
+    private static DataAccess data;
 
-    private static UserService userService = new UserService();
+    static {
+        try {
+            data = new MemoryDataAccess();
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    private static RegisterService registerService = new RegisterService();
+    private static UserService userService;
 
-    private GameService gameService = new GameService();
-    private ClearService clearService = new ClearService();
+    private static RegisterService registerService;
+
+    private static GameService gameService;
+    private static ClearService clearService;
 
     // Initialize a spark.Response variable for testing
     private static final Response RESPONSE = new Response() {
@@ -52,8 +61,15 @@ class ServiceUnitTests {
     private static GameData gameOne = new GameData(5699, null, null, "beat unnie", new ChessGame());
     private static GameData gameTwo = new GameData(1654, null, null, "beat joon", new ChessGame());
 
+    ServiceUnitTests() throws SQLException, DataAccessException {
+    }
+
     @BeforeAll
     public static void init() {
+        userService = new UserService(data);
+        registerService = new RegisterService(data);
+        gameService = new GameService(data);
+        clearService = new ClearService(data);
 
         existingUser = new TestUser("ExistingUser", "existingUserPassword", "eu@mail.com");
 
@@ -61,12 +77,11 @@ class ServiceUnitTests {
     }
 
     @BeforeEach
-    public void setup() throws DataAccessException {
+    public void setup() throws DataAccessException, SQLException {
         ClearResults results = clearService.clearAll(RESPONSE);
-        RegisterService regService  = new RegisterService();
         UserData holdingUser = new UserData(existingUser.getUsername(), existingUser.getPassword(), existingUser.getEmail());
         //one user already logged in
-        RegisterResults regResults = regService.register(holdingUser, RESPONSE);
+        RegisterResults regResults = registerService.register(data, holdingUser, RESPONSE);
         existingAuth = regResults.authToken();
     }
 
@@ -100,7 +115,7 @@ class ServiceUnitTests {
     @Order(4)
     @DisplayName("Logout Success")
     public void logoutSuccess() throws DataAccessException{
-        AuthData auth = userService.authDAO.getAuth(existingUser.getUsername());
+        AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
 
         LogoutAndJoinResults logoutResult = userService.logout(auth, RESPONSE);
 
@@ -121,10 +136,10 @@ class ServiceUnitTests {
     @Test
     @Order(5)
     @DisplayName("Register Success")
-    public void registerSuccess() throws DataAccessException {
+    public void registerSuccess() throws DataAccessException, SQLException {
         UserData testUser = new UserData(newUser.getUsername(), newUser.getPassword(), newUser.getEmail());
 
-        RegisterResults registerResults = registerService.register(testUser, RESPONSE);
+        RegisterResults registerResults = registerService.register(data, testUser, RESPONSE);
 
         Assertions.assertEquals(newUser.getUsername(),registerResults.username(), "register did not succeed");
         Assertions.assertNotNull(registerResults.authToken(), "authToken was not created");
@@ -134,9 +149,9 @@ class ServiceUnitTests {
     @Test
     @Order(6)
     @DisplayName("Register Failed")
-    public void registerFailed() throws DataAccessException{
+    public void registerFailed() throws DataAccessException, SQLException {
         UserData testUser = new UserData(existingUser.getUsername(), null, existingUser.getEmail());
-        RegisterResults registerResults = registerService.register(testUser, RESPONSE);
+        RegisterResults registerResults = registerService.register(data, testUser, RESPONSE);
 
         Assertions.assertEquals("Error: bad request",registerResults.message(), "register succeeded");
         Assertions.assertNull(registerResults.authToken(), "authToken was created when there should be null");
@@ -146,7 +161,7 @@ class ServiceUnitTests {
     @Order(7)
     @DisplayName("Create Game Success")
     public void createGameSuccess() throws DataAccessException{
-        AuthData auth = userService.authDAO.getAuth(existingUser.getUsername());
+        AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
         CreateGameResults gameResults = gameService.createGame(gameOne, auth, RESPONSE);
 
         Assertions.assertNull(gameResults.getMessage(), "did not create game succesfully");
@@ -166,7 +181,7 @@ class ServiceUnitTests {
     @Order(8)
     @DisplayName("List Games Success")
     public void listGames() throws DataAccessException{
-        AuthData auth = userService.authDAO.getAuth(existingUser.getUsername());
+        AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
         ListGameResults results = gameService.listGames(auth, RESPONSE);
 
         Assertions.assertNull(results.message(), "games were not returned");
@@ -186,7 +201,7 @@ class ServiceUnitTests {
     @Order(10)
     @DisplayName("Join Game Success")
     public void joinedGame() throws DataAccessException{
-        AuthData auth = userService.authDAO.getAuth(existingUser.getUsername());
+        AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
         GameData game = new GameData(null, null, null, "my game", new ChessGame());
         CreateGameResults temp = gameService.createGame(game, auth, RESPONSE);
         JoinGameRequest joinRequest = new JoinGameRequest(temp.getGameID(), ChessGame.TeamColor.WHITE);
@@ -201,7 +216,7 @@ class ServiceUnitTests {
     @DisplayName("Join Game Failure")
     public void failedJoiningGame() throws DataAccessException{
 
-        AuthData auth = userService.authDAO.getAuth(existingUser.getUsername());
+        AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
         GameData game = new GameData(null, "Jin", null, "my game", new ChessGame());
         CreateGameResults temp = gameService.createGame(game, auth, RESPONSE);
         JoinGameRequest joinRequest = new JoinGameRequest(temp.getGameID(), ChessGame.TeamColor.WHITE);

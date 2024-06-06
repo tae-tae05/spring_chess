@@ -1,19 +1,24 @@
 package service;
 
+import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.memory.MemoryAuthDAO;
+import dataaccess.memory.MemoryUserDAO;
 import model.AuthData;
 import model.UserData;
 import results.RegisterResults;
 import spark.Response;
 
+import javax.xml.crypto.Data;
+import java.sql.SQLException;
 import java.util.UUID;
 
 public class RegisterService {
-    MemoryUserDAO userDAO = new MemoryUserDAO();
-    MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    public RegisterResults register(UserData user, Response response) throws DataAccessException {
+    private final DataAccess data;
+    public RegisterService(DataAccess data){
+        this.data = data;
+    }
+    public RegisterResults register(DataAccess data, UserData user, Response response) throws DataAccessException, SQLException {
 
         RegisterResults regResults = new RegisterResults(null,null,null);
         if(user.username() == null || user.password() == null || user.email() == null){
@@ -21,15 +26,15 @@ public class RegisterService {
             response.status(400);
             return regResults;
         }
-        if(userDAO.getUser(user)){
+        if(data.getUserDAO().getUser(user)){
             regResults = regResults.setMessage("Error: already taken");
             response.status(403);
             return regResults;
         }
         try{
-            userDAO.createUser(user);
+            data.getUserDAO().createUser(user);
             AuthData one = new AuthData(UUID.randomUUID().toString(), user.username());
-            authDAO.createAuth(one);
+            data.getAuthDAO().createAuth(one);
             regResults = regResults.setUsername(user.username());
             regResults = regResults.setAuthToken(one.authToken());
             response.status(200);

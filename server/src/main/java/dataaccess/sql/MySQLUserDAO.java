@@ -1,23 +1,25 @@
-package dataaccess;
+package dataaccess.sql;
 
+import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.UserDAO;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class MySQLUserDAO implements UserDAO {
     private static String SALT = BCrypt.gensalt();
+
+    public MySQLUserDAO() throws DataAccessException, SQLException {
+    }
+
     @Override
     public boolean getUser(UserData user) throws DataAccessException, SQLException {
         String find = user.username();
@@ -32,11 +34,6 @@ public class MySQLUserDAO implements UserDAO {
             throw new DataAccessException(e.getMessage());
         }
 
-    }
-
-    @Override
-    public Collection<UserData> getAllUsers() {
-        return null;
     }
 
     @Override
@@ -59,14 +56,23 @@ public class MySQLUserDAO implements UserDAO {
         int result = pst.executeUpdate();
     }
 
-    protected String createStatements(){
-        String create = """
-                        CREATE TABLE IF NOT EXISTS `user`
-                            (`username` VARCHAR(64) NOT NULL,
-                            `password` VARCHAR(64) NOT NULL,
-                            `email` VARCHAR(64) NOT NULL,
-                            PRIMARY KEY (`username`))
-                """;
-        return create;
+    @Override
+    public Collection<UserData> getAllUsers() throws DataAccessException {
+        Collection<UserData> allUsers = new ArrayList<>();
+        try(var connection = DatabaseManager.getConnection()) {
+            String findUsers = """
+                    SELECT username, password, email FROM user""";
+            try(var pst = connection.prepareStatement(findUsers)){
+                var rs = pst.executeQuery();
+                Gson gson = new Gson();
+                while(rs.next()){
+                    UserData user = new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
+                    allUsers.add(user);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return allUsers;
     }
 }

@@ -13,4 +13,6 @@ public interface AuthDAO {
     AuthData deleteAuth(AuthData auth) throws DataAccessException;
     void clear();
     Collection<AuthData> getAuths();
+
+    AuthData getAuth(String username);
 }

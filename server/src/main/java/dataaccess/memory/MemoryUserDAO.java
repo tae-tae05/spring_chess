@@ -1,12 +1,14 @@
-package dataaccess;
+package dataaccess.memory;
 
+import dataaccess.DataAccessException;
+import dataaccess.UserDAO;
 import model.UserData;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class MemoryUserDAO implements UserDAO{
+public class MemoryUserDAO implements UserDAO {
     public Collection<UserData> USERS = new ArrayList<>();
     @Override
     public boolean getUser(UserData user) {
@@ -19,7 +21,7 @@ public class MemoryUserDAO implements UserDAO{
         return false;
         //returns false if it does not exist
     }
-    public boolean checkUser(String username, String password) throws DataAccessException{
+    public boolean checkUser(String username, String password) throws DataAccessException {
         for(UserData current: USERS) {
             if (current.username().equals(username) && current.password().equals(password)) {
                 return true;

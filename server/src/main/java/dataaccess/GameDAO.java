@@ -16,4 +16,5 @@ public interface GameDAO {
     boolean verifyBlackPosition(int gameID);
     void deleteGames();
     void insertUsername(int gameID, String newUsername, ChessGame.TeamColor color);
+    boolean verifyGame(Integer gameID);
 }

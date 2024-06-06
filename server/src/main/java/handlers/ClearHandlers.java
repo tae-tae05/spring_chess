@@ -1,6 +1,7 @@
 package handlers;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccess;
 import results.ClearResults;
 import service.ClearService;
 import service.GameService;
@@ -12,7 +13,12 @@ import spark.Route;
 import java.net.NoRouteToHostException;
 
 public class ClearHandlers implements Route {
-    ClearService clearService = new ClearService();
+    private final DataAccess data;
+    ClearService clearService;
+    public ClearHandlers(DataAccess data){
+        this.data = data;
+        clearService = new ClearService(data);
+    }
     @Override
     public Object handle(Request request, Response response) throws Exception {
         var serializer = new Gson();

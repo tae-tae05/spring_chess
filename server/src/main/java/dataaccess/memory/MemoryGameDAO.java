@@ -1,11 +1,14 @@
-package dataaccess;
+package dataaccess.memory;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
 import model.GameData;
 
 import java.util.List;
+import java.util.Objects;
 
-public class MemoryGameDAO implements GameDAO{
+public class MemoryGameDAO implements GameDAO {
 
     @Override
     public void addGame(GameData game) throws DataAccessException {
@@ -37,10 +40,10 @@ public class MemoryGameDAO implements GameDAO{
         }
         return false;
     }
-
-    public boolean verifyGame(int gameID){
+    @Override
+    public boolean verifyGame(Integer gameID){
         for (GameData game : GAMES) {
-            if (gameID == game.gameID()) {
+            if (Objects.equals(gameID, game.gameID())) {
                 return true;
             }
         }

@@ -10,5 +10,5 @@ public interface UserDAO {
     boolean getUser(UserData user) throws DataAccessException, SQLException; //does not need to check auth
     void createUser(UserData user) throws DataAccessException, SQLException; //puts it into database
     void deleteUsers() throws DataAccessException, SQLException;
-    Collection<UserData> getAllUsers();
+    Collection<UserData> getAllUsers() throws DataAccessException;
 }
