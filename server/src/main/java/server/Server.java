@@ -12,19 +12,20 @@ import java.sql.SQLException;
 
 
 public class Server {
-
-    public int run(int desiredPort) {
-        Spark.port(desiredPort);
-
-        Spark.staticFiles.location("web");
-
-        DataAccess data;
+    DataAccess data;
+    public Server(){
         try{
             data = new MySQLDataAccess();
         }
         catch(DataAccessException | SQLException e){
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    public int run(int desiredPort) {
+        Spark.port(desiredPort);
+
+        Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", new RegisterHandler(data));
