@@ -3,8 +3,7 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.memory.MemoryAuthDAO;
-import dataaccess.memory.MemoryGameDAO;
+
 import model.AuthData;
 import model.GameData;
 import request.JoinGameRequest;
@@ -15,8 +14,6 @@ import java.sql.SQLException;
 import java.util.Random;
 
 public class GameService {
-//    private MemoryGameDAO gameDAO = new MemoryGameDAO();
-//    private MemoryAuthDAO authDAO = new MemoryAuthDAO();
     private final DataAccess data;
 
     public GameService(DataAccess data){
@@ -71,8 +68,7 @@ public class GameService {
             return results;
         }
         try{
-            MemoryAuthDAO authDAO = (MemoryAuthDAO) data.getAuthDAO();
-            String username = authDAO.getUsername(auth);
+            String username = data.getAuthDAO().getUsername(auth);
             data.getGameDAO().insertUsername(join.getGameID(), username, join.getTeamColor());
             response.status(200);
         }
@@ -91,8 +87,7 @@ public class GameService {
             return results;
         }
         try{
-            MemoryGameDAO gameDAO = (MemoryGameDAO) data.getGameDAO();
-            results = results.setGames(gameDAO.listGames());
+            results = results.setGames(data.getGameDAO().listGames());
             response.status(200);
         }
         catch(Exception e){

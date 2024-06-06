@@ -44,7 +44,7 @@ public class MySQLAuthDAO implements AuthDAO {
     @Override
     public boolean verifyUserAuth(AuthData auth) throws DataAccessException{
         String find = auth.username();
-        String sql = "SELECT authToken FROM auth WHERE username= '" + auth.username() + "'";
+        String sql = "SELECT authToken FROM auth WHERE authToken= '" + auth.authToken() + "'";
         try{
             var connection = DatabaseManager.getConnection();
             var pst = connection.prepareStatement(sql);
@@ -83,6 +83,20 @@ public class MySQLAuthDAO implements AuthDAO {
             ResultSet rs = pst.executeQuery();
             rs.next();
             return new AuthData(rs.getString("authToken"), rs.getString("username"));
+        } catch (DataAccessException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String getUsername(AuthData auth) {
+        String sql = "SELECT username FROM auth WHERE authToken= '" + auth.authToken() + "'";
+        try{
+            var connection = DatabaseManager.getConnection();
+            var pst = connection.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            rs.next();
+            return rs.getString("username");
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }

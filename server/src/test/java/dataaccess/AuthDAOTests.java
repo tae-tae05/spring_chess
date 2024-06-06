@@ -119,4 +119,14 @@ public class AuthDAOTests {
         authDAO.deleteAuth(one);
         Assertions.assertTrue(authDAO.verifyUserAuth(two));
     }
+    @Test
+    public void getUsernamePass() throws SQLException, DataAccessException {
+        authDAO.createAuth(one);
+        Assertions.assertEquals("jin", authDAO.getUsername(one));
+    }
+    @Test
+    public void getUsernameFail() throws SQLException, DataAccessException {
+        authDAO.createAuth(one);
+        Assertions.assertNotEquals("jj", authDAO.getUsername(one));
+    }
 }

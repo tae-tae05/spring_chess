@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class MySQLGameDAO implements GameDAO {
 
@@ -19,8 +20,8 @@ public class MySQLGameDAO implements GameDAO {
     }
 
     @Override
-    public Collection<GameData> listGames() {
-        Collection<GameData> allGames= new ArrayList<>();
+    public List<GameData> listGames() {
+        List<GameData> allGames= new ArrayList<>();
         try(var connection = DatabaseManager.getConnection()) {
             String findUsers = """
                     SELECT gameID, whiteUsername, blackUsername, gameName, game FROM auth""";
@@ -102,7 +103,7 @@ public class MySQLGameDAO implements GameDAO {
             sql = "UPDATE game SET blackUsername = ?";
         }
         else{
-            throw new DataAccessException("both names are taken");
+            throw new DataAccessException("could not enter name");
         }
         var connection = DatabaseManager.getConnection();
         var pst = connection.prepareStatement(sql);
@@ -122,4 +123,31 @@ public class MySQLGameDAO implements GameDAO {
             throw new RuntimeException(e);
         }
     }
+
+    public void updateGame(ChessGame game) throws DataAccessException, SQLException {
+        String sql = "UPDATE game SET game = ?";
+        var gson = new Gson();
+        try {
+            var connection = DatabaseManager.getConnection();
+            var pst = connection.prepareStatement(sql);
+            pst.setString(1, gson.toJson(game));
+            int result = pst.executeUpdate();
+        }
+        catch (DataAccessException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+//    public String getWhiteUsername(int gameID){
+//        String sql = "SELECT whiteUsername FROM game WHERE gameID= '" + gameID + "'";
+//        try{
+//            var connection = DatabaseManager.getConnection();
+//            var pst = connection.prepareStatement(sql);
+//            ResultSet rs = pst.executeQuery();
+//            rs.next();
+//            return rs.getString("whiteUSername");
+//        } catch (DataAccessException | SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 }

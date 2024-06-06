@@ -50,7 +50,7 @@ public class UserService {
     public LogoutAndJoinResults logout(AuthData auth, Response response) throws DataAccessException, SQLException {
         var serializer = new Gson();
         LogoutAndJoinResults logoutResult = new LogoutAndJoinResults(null);
-//        MemoryAuthDAO authDAO = (MemoryAuthDAO) data.getAuthDAO();
+        System.out.println(auth);
         if(!data.getAuthDAO().verifyUserAuth(auth)){
             logoutResult = logoutResult.setMessage("Error: unauthorized");
             response.status(401);

@@ -10,6 +10,12 @@ import java.util.Objects;
 
 public class MemoryGameDAO implements GameDAO {
 
+
+//    @Override
+//    public Object getWhiteUsername(int gameID) {
+//        return null;
+//    }
+
     @Override
     public void addGame(GameData game) throws DataAccessException {
         if(GAMES.contains(game)){
@@ -17,6 +23,7 @@ public class MemoryGameDAO implements GameDAO {
         }
         GAMES.add(game);
     }
+
 
     @Override
     public boolean verifyBlackPosition(int gameID) {
