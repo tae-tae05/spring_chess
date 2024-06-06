@@ -70,25 +70,6 @@ public class UserDAOTests {
     }
     @Test
     public void createUserPass() throws SQLException, DataAccessException {
-//        var connection = DatabaseManager.getConnection();
-//        userDAO.createUser(one);
-//        String getOne = """
-//                SELECT username FROM user WHERE username =?
-//                """;
-//        try{
-//            var pst = connection.prepareStatement(getOne);
-//            pst.setString(1,"jin");
-//            var rs = pst.executeQuery();
-//            if(rs.next()){
-//                Assertions.assertNotEquals(rs.getString(1), null);
-//            }
-//            else{
-//                Assertions.fail("was not added correctly");
-//            }
-//        }
-//        catch(SQLException e){
-//            throw new RuntimeException(e.getMessage());
-//        }
         userDAO.createUser(one);
         Assertions.assertTrue(userDAO.getUser(one));
     }

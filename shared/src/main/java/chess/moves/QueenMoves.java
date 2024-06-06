@@ -10,138 +10,44 @@ public class QueenMoves implements MovesCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor current) {
         int row = myPosition.getRow();;
         int col = myPosition.getColumn();
+        Collection<ChessMove> addMoves = tempMoves(row, col, 1, 1, board, myPosition, current);
+        Collection<ChessMove> moves = new ArrayList<>(addMoves);
+        moves.addAll(tempMoves(row, col, 1, -1, board, myPosition, current));
+        moves.addAll(tempMoves(row, col, -1, 1, board, myPosition, current));
+        moves.addAll(tempMoves(row, col, -1, -1, board, myPosition, current));
+        moves.addAll(tempMoves(row, col, 1, 0, board, myPosition, current));
+        moves.addAll(tempMoves(row, col, -1, 0, board, myPosition, current));
+        moves.addAll(tempMoves(row, col, 0, 1, board, myPosition, current));
+        moves.addAll(tempMoves(row, col, 0, -1, board, myPosition, current));
+        return moves;
+    }
+
+    public Collection<ChessMove> tempMoves(int row, int col, int p, int j, ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor current){
         Collection<ChessMove> moves = new ArrayList<>();
         for(int i = 1; i < 9; i++){
-            //on same row (vertical) going up
-            if(isValid(row + i, col)){
-                ChessPosition next = new ChessPosition(row + i, col);
+            int a = p * i;
+            int b = j * i;
+            if(isValid(row+a, col+b)){
+                ChessPosition next = new ChessPosition(row+a, col+b);
                 if(board.getPiece(next) == null){
-                    moves.add(new ChessMove(myPosition, next, null));
+                    ChessMove tempMove = new ChessMove(myPosition, next, null);
+                    moves.add(tempMove);
                 }
-                else if(board.getPiece(next).getTeamColor() != current){
-                    moves.add(new ChessMove(myPosition, next, null));
-                    break;
-                }
-                else{ //if it's blocked by same team member
+                else if(board.getPiece(next) != null) {
+                    if (board.getPiece(next).getTeamColor() == current) {
+                        break;
+                    }
+                    ChessMove tempMove = new ChessMove(myPosition, next, null);
+                    moves.add(tempMove);
                     break;
                 }
             }
-        }
-        for(int i = 1; i < 9; i++){
-            //on same row going down
-            if(isValid(row - i, col)){
-                ChessPosition next = new ChessPosition(row - i, col);
-                if(board.getPiece(next) == null){
-                    moves.add(new ChessMove(myPosition, next, null));
-                }
-                else if(board.getPiece(next).getTeamColor() != current){
-                    moves.add(new ChessMove(myPosition, next, null));
-                    break;
-                }
-                else{ //if it's blocked by same team member
-                    break;
-                }
-            }
-        }
-        for(int i = 1; i < 9; i++){
-            //on the horizontal
-            if(isValid(row, col + i)){
-                ChessPosition next = new ChessPosition(row, col + i);
-                if(board.getPiece(next) == null){
-                    moves.add(new ChessMove(myPosition, next, null));
-                }
-                else if(board.getPiece(next).getTeamColor() != current){
-                    moves.add(new ChessMove(myPosition, next, null));
-                    break;
-                }
-                else{ //if it's blocked by same team member
-                    break;
-                }
-            }
-        }
-        for(int i = 1; i < 9; i++){
-            //on the horizontal
-            if(isValid(row, col - i)){
-                ChessPosition next = new ChessPosition(row, col - i);
-                if(board.getPiece(next) == null){
-                    moves.add(new ChessMove(myPosition, next, null));
-                }
-                else if(board.getPiece(next).getTeamColor() != current){
-                    moves.add(new ChessMove(myPosition, next, null));
-                    break;
-                }
-                else{ //if it's blocked by same team member
-                    break;
-                }
-            }
-        }
-        for(int i = 1; i < 9; i++){
-            //on the diagonal
-            if(isValid(row + i, col + i)){
-                ChessPosition next = new ChessPosition(row + i, col + i);
-                if(board.getPiece(next) == null){
-                    moves.add(new ChessMove(myPosition, next, null));
-                }
-                else if(board.getPiece(next).getTeamColor() != current){
-                    moves.add(new ChessMove(myPosition, next, null));
-                    break;
-                }
-                else{ //if it's blocked by same team member
-                    break;
-                }
-            }
-        }
-        for(int i = 1; i < 9; i++){
-            //on the diagonal
-            if(isValid(row + i, col - i)){
-                ChessPosition next = new ChessPosition(row + i, col - i);
-                if(board.getPiece(next) == null){
-                    moves.add(new ChessMove(myPosition, next, null));
-                }
-                else if(board.getPiece(next).getTeamColor() != current){
-                    moves.add(new ChessMove(myPosition, next, null));
-                    break;
-                }
-                else{ //if it's blocked by same team member
-                    break;
-                }
-            }
-        }
-        for(int i = 1; i < 9; i++){
-            //on the diagonal
-            if(isValid(row - i, col + i)){
-                ChessPosition next = new ChessPosition(row - i, col + i);
-                if(board.getPiece(next) == null){
-                    moves.add(new ChessMove(myPosition, next, null));
-                }
-                else if(board.getPiece(next).getTeamColor() != current){
-                    moves.add(new ChessMove(myPosition, next, null));
-                    break;
-                }
-                else{ //if it's blocked by same team member
-                    break;
-                }
-            }
-        }
-        for(int i = 1; i < 9; i++){
-            //on the diagonal
-            if(isValid(row - i, col - i)){
-                ChessPosition next = new ChessPosition(row - i, col - i);
-                if(board.getPiece(next) == null){
-                    moves.add(new ChessMove(myPosition, next, null));
-                }
-                else if(board.getPiece(next).getTeamColor() != current){
-                    moves.add(new ChessMove(myPosition, next, null));
-                    break;
-                }
-                else{ //if it's blocked by same team member
-                    break;
-                }
+            else{
+                break;
             }
         }
         return moves;
     }
-
     @Override
     public Boolean isValid(int row, int col) {
         return row < 9 && row > 0 && col < 9 && col > 0;

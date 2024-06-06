@@ -49,7 +49,6 @@ public class Server {
     public static void main(String[] args) {
         var server = new Server();
         try {
-            System.out.println("Here");
             configureDatabase();
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
