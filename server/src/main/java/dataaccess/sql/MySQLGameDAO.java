@@ -16,15 +16,16 @@ import java.util.List;
 
 public class MySQLGameDAO implements GameDAO {
 
+    static int i = 0;
     public MySQLGameDAO() throws DataAccessException, SQLException {
     }
 
     @Override
-    public List<GameData> listGames() {
-        List<GameData> allGames= new ArrayList<>();
+    public Collection<GameData> listGames() {
+        Collection<GameData> allGames= new ArrayList<>();
         try(var connection = DatabaseManager.getConnection()) {
             String findUsers = """
-                    SELECT gameID, whiteUsername, blackUsername, gameName, game FROM auth""";
+                    SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game""";
             try(var pst = connection.prepareStatement(findUsers)){
                 var rs = pst.executeQuery();
                 while(rs.next()){
@@ -43,22 +44,22 @@ public class MySQLGameDAO implements GameDAO {
     @Override
     public void addGame(GameData game) throws DataAccessException, SQLException {
         String sql = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
-        var connection = DatabaseManager.getConnection();
-        var pst = connection.prepareStatement(sql);
-        var gson = new Gson();
-        pst.setString(1, String.valueOf(game.gameID()));
-        pst.setString(2, game.whiteUsername());
-        pst.setString(3, game.blackUsername());
-        pst.setString(4, game.gameName());
-        pst.setString(5, gson.toJson(game.game()));
-        int result = pst.executeUpdate();
+        try (var connection = DatabaseManager.getConnection()) {
+            var pst = connection.prepareStatement(sql);
+            var gson = new Gson();
+            pst.setString(1, String.valueOf(game.gameID()));
+            pst.setString(2, game.whiteUsername());
+            pst.setString(3, game.blackUsername());
+            pst.setString(4, game.gameName());
+            pst.setString(5, gson.toJson(game.game()));
+            int result = pst.executeUpdate();
+        }
     }
 
     @Override
     public boolean verifyBlackPosition(int gameID) {
         String sql = "SELECT blackUsername FROM game WHERE gameID= '" + String.valueOf(gameID) + "'";
-        try{
-            var connection = DatabaseManager.getConnection();
+        try (var connection = DatabaseManager.getConnection()){
             var pst = connection.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
             rs.next();
@@ -72,8 +73,7 @@ public class MySQLGameDAO implements GameDAO {
     @Override
     public boolean verifyWhitePosition(int gameID) {
         String sql = "SELECT whiteUsername FROM game WHERE gameID= '" + String.valueOf(gameID) + "'";
-        try{
-            var connection = DatabaseManager.getConnection();
+        try (var connection = DatabaseManager.getConnection()){
             var pst = connection.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
             rs.next();
@@ -87,9 +87,10 @@ public class MySQLGameDAO implements GameDAO {
     @Override
     public void deleteGames() throws DataAccessException, SQLException {
         String sql = "TRUNCATE TABLE game";
-        var connection = DatabaseManager.getConnection();
-        var pst = connection.prepareStatement(sql);
-        int result = pst.executeUpdate();
+        try (var connection = DatabaseManager.getConnection()) {
+            var pst = connection.prepareStatement(sql);
+            int result = pst.executeUpdate();
+        }
     }
 
     @Override
@@ -105,17 +106,17 @@ public class MySQLGameDAO implements GameDAO {
         else{
             throw new DataAccessException("could not enter name");
         }
-        var connection = DatabaseManager.getConnection();
-        var pst = connection.prepareStatement(sql);
-        pst.setString(1, newUsername);
-        int result = pst.executeUpdate();
+        try(var connection = DatabaseManager.getConnection()) {
+            var pst = connection.prepareStatement(sql);
+            pst.setString(1, newUsername);
+            int result = pst.executeUpdate();
+        }
     }
 
     @Override
     public boolean verifyGame(Integer gameID) {
         String sql = "SELECT gameID FROM game WHERE gameID= '" + gameID + "'";
-        try{
-            var connection = DatabaseManager.getConnection();
+        try (var connection = DatabaseManager.getConnection()){
             var pst = connection.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
             return rs.next();
@@ -127,8 +128,7 @@ public class MySQLGameDAO implements GameDAO {
     public void updateGame(ChessGame game) throws DataAccessException, SQLException {
         String sql = "UPDATE game SET game = ?";
         var gson = new Gson();
-        try {
-            var connection = DatabaseManager.getConnection();
+        try (var connection = DatabaseManager.getConnection()){
             var pst = connection.prepareStatement(sql);
             pst.setString(1, gson.toJson(game));
             int result = pst.executeUpdate();
@@ -138,16 +138,4 @@ public class MySQLGameDAO implements GameDAO {
         }
     }
 
-//    public String getWhiteUsername(int gameID){
-//        String sql = "SELECT whiteUsername FROM game WHERE gameID= '" + gameID + "'";
-//        try{
-//            var connection = DatabaseManager.getConnection();
-//            var pst = connection.prepareStatement(sql);
-//            ResultSet rs = pst.executeQuery();
-//            rs.next();
-//            return rs.getString("whiteUSername");
-//        } catch (DataAccessException | SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 }

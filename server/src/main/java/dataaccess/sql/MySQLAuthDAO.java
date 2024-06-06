@@ -36,17 +36,17 @@ public class MySQLAuthDAO implements AuthDAO {
     @Override
     public void clear() throws DataAccessException, SQLException {
         String sql = "TRUNCATE TABLE auth";
-        var connection = DatabaseManager.getConnection();
-        var pst = connection.prepareStatement(sql);
-        int result = pst.executeUpdate();
+        try (var connection = DatabaseManager.getConnection()) {
+            var pst = connection.prepareStatement(sql);
+            int result = pst.executeUpdate();
+        }
     }
 
     @Override
     public boolean verifyUserAuth(AuthData auth) throws DataAccessException{
         String find = auth.username();
         String sql = "SELECT authToken FROM auth WHERE authToken= '" + auth.authToken() + "'";
-        try{
-            var connection = DatabaseManager.getConnection();
+        try (var connection = DatabaseManager.getConnection()){
             var pst = connection.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
             return rs.next();
@@ -58,27 +58,28 @@ public class MySQLAuthDAO implements AuthDAO {
     @Override
     public void deleteAuth(AuthData auth) throws DataAccessException, SQLException {
         String sql = "DELETE FROM auth WHERE authToken = ?";
-        var connection = DatabaseManager.getConnection();
-        var pst = connection.prepareStatement(sql);
-        pst.setString(1, auth.authToken());
-        var rs = pst.executeUpdate();
+        try (var connection = DatabaseManager.getConnection()) {
+            var pst = connection.prepareStatement(sql);
+            pst.setString(1, auth.authToken());
+            var rs = pst.executeUpdate();
+        }
     }
 
     @Override
     public void createAuth(AuthData auth) throws DataAccessException, SQLException {
         String sql = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
-        var connection = DatabaseManager.getConnection();
-        var pst = connection.prepareStatement(sql);
-        pst.setString(1, auth.authToken());
-        pst.setString(2, auth.username());
-        int result = pst.executeUpdate();
+        try(var connection = DatabaseManager.getConnection()) {
+            var pst = connection.prepareStatement(sql);
+            pst.setString(1, auth.authToken());
+            pst.setString(2, auth.username());
+            int result = pst.executeUpdate();
+        }
     }
 
     @Override
     public AuthData getAuth(String username) {
         String sql = "SELECT authToken, username FROM auth WHERE username= '" + username + "'";
-        try{
-            var connection = DatabaseManager.getConnection();
+        try (var connection = DatabaseManager.getConnection()){
             var pst = connection.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
             rs.next();
@@ -91,8 +92,7 @@ public class MySQLAuthDAO implements AuthDAO {
     @Override
     public String getUsername(AuthData auth) {
         String sql = "SELECT username FROM auth WHERE authToken= '" + auth.authToken() + "'";
-        try{
-            var connection = DatabaseManager.getConnection();
+        try (var connection = DatabaseManager.getConnection()){
             var pst = connection.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
             rs.next();

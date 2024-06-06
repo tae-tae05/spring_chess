@@ -23,8 +23,7 @@ public class MySQLUserDAO implements UserDAO {
     @Override
     public boolean checkUser(String username, String password) throws DataAccessException {
         String sql = "SELECT username FROM user WHERE username= '" + username + "'";
-        try{
-            var connection = DatabaseManager.getConnection();
+        try (var connection = DatabaseManager.getConnection()){
             var pst = connection.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
             if(!rs.next()){
@@ -36,8 +35,7 @@ public class MySQLUserDAO implements UserDAO {
         }
         sql = "SELECT password FROM user WHERE username= '" + username + "'";
         String foundPassword = "";
-        try{
-            var connection = DatabaseManager.getConnection();
+        try (var connection = DatabaseManager.getConnection()){
             var pst = connection.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
             rs.next();
@@ -53,8 +51,7 @@ public class MySQLUserDAO implements UserDAO {
     public boolean getUser(UserData user) throws DataAccessException, SQLException {
         String find = user.username();
         String sql = "SELECT username FROM user WHERE username= '" + user.username() + "'";
-        try{
-            var connection = DatabaseManager.getConnection();
+        try (var connection = DatabaseManager.getConnection()){
             var pst = connection.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
             return rs.next();
@@ -69,20 +66,22 @@ public class MySQLUserDAO implements UserDAO {
     public void createUser(UserData user) throws DataAccessException, SQLException {
         String hashPassword = BCrypt.hashpw(user.password(), SALT);
         String sql = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        var connection = DatabaseManager.getConnection();
-        var pst = connection.prepareStatement(sql);
-        pst.setString(1,user.username());
-        pst.setString(2, hashPassword);
-        pst.setString(3, user.email());
-        int result = pst.executeUpdate();
+        try (var connection = DatabaseManager.getConnection()) {
+            var pst = connection.prepareStatement(sql);
+            pst.setString(1, user.username());
+            pst.setString(2, hashPassword);
+            pst.setString(3, user.email());
+            int result = pst.executeUpdate();
+        }
     }
 
     @Override
     public void deleteUsers() throws DataAccessException, SQLException {
         String sql = "TRUNCATE TABLE user";
-        var connection = DatabaseManager.getConnection();
-        var pst = connection.prepareStatement(sql);
-        int result = pst.executeUpdate();
+        try (var connection = DatabaseManager.getConnection()) {
+            var pst = connection.prepareStatement(sql);
+            int result = pst.executeUpdate();
+        }
     }
 
     @Override

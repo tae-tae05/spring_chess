@@ -5,16 +5,12 @@ import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import model.GameData;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 public class MemoryGameDAO implements GameDAO {
 
-
-//    @Override
-//    public Object getWhiteUsername(int gameID) {
-//        return null;
-//    }
 
     @Override
     public void addGame(GameData game) throws DataAccessException {
@@ -75,7 +71,7 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public List<GameData> listGames() {
+    public Collection<GameData> listGames() {
         return GAMES;
     }
 

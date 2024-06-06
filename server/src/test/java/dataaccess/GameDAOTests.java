@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import server.Server;
 
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.List;
 
 public class GameDAOTests {
     private static GameDAO gameDAO;
@@ -112,6 +114,10 @@ public class GameDAOTests {
         gameDAO.addGame(one);
         gameDAO.addGame(two);
         gameDAO.addGame(three);
+        Collection<GameData> allGames = gameDAO.listGames();
+        for(GameData game: allGames){
+            System.out.println(game);
+        }
         Assertions.assertTrue(gameDAO.verifyGame(one.gameID()));
         Assertions.assertTrue(gameDAO.verifyGame(two.gameID()));
         Assertions.assertTrue(gameDAO.verifyGame(three.gameID()));
