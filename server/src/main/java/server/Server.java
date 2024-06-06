@@ -20,6 +20,11 @@ public class Server {
         catch(DataAccessException | SQLException e){
             throw new RuntimeException(e.getMessage());
         }
+        try {
+            configureDatabase();
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int run(int desiredPort) {
@@ -49,11 +54,6 @@ public class Server {
 
     public static void main(String[] args) {
         var server = new Server();
-        try {
-            configureDatabase();
-        } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
-        }
         server.run(8080);
     }
 
