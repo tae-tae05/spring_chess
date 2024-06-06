@@ -75,11 +75,12 @@ public class Server {
 
             var gameTable = """
                     CREATE TABLE IF NOT EXISTS `game` (
-                    `gameID` INT PRIMARY KEY AUTO_INCREMENT,
+                    `gameID` INT,
                     `whiteUsername` VARCHAR(64),
                     `blackUsername` VARCHAR(64),
                     `gameName` VARCHAR(64) NOT NULL,
-                    `game` LONGTEXT NOT NULL
+                    `game` LONGTEXT NOT NULL,
+                    PRIMARY KEY (gameID)
                     )""";
 
 

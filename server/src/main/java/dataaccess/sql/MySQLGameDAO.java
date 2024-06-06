@@ -16,7 +16,7 @@ import java.util.List;
 
 public class MySQLGameDAO implements GameDAO {
 
-    static int i = 0;
+    static int i = 1;
     public MySQLGameDAO() throws DataAccessException, SQLException {
     }
 
@@ -25,13 +25,14 @@ public class MySQLGameDAO implements GameDAO {
         Collection<GameData> allGames= new ArrayList<>();
         try(var connection = DatabaseManager.getConnection()) {
             String findUsers = """
-                    SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game""";
+                    SELECT * FROM game""";
             try(var pst = connection.prepareStatement(findUsers)){
                 var rs = pst.executeQuery();
                 while(rs.next()){
                     var gson = new Gson();
                     ChessGame chess = gson.fromJson(rs.getString("game"), ChessGame.class);
-                    GameData game = new GameData(rs.findColumn("gameID"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), chess);
+                    String gameID = rs.getString("gameID");
+                    GameData game = new GameData(Integer.valueOf(gameID), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), chess);
                     allGames.add(game);
                 }
             }
@@ -97,11 +98,11 @@ public class MySQLGameDAO implements GameDAO {
     public void insertUsername(int gameID, String newUsername, ChessGame.TeamColor color) throws DataAccessException, SQLException {
         String sql = "";
         if(color == ChessGame.TeamColor.WHITE && verifyWhitePosition(gameID)){
-            sql = "UPDATE game SET whiteUsername = ?";
+            sql = "UPDATE game SET whiteUsername = ? WHERE gameID = " + String.valueOf(gameID);
 
         }
         else if(color == ChessGame.TeamColor.BLACK && verifyBlackPosition(gameID)){
-            sql = "UPDATE game SET blackUsername = ?";
+            sql = "UPDATE game SET blackUsername = ? WHERE gameID = " + String.valueOf(gameID);
         }
         else{
             throw new DataAccessException("could not enter name");
@@ -125,17 +126,17 @@ public class MySQLGameDAO implements GameDAO {
         }
     }
 
-    public void updateGame(ChessGame game) throws DataAccessException, SQLException {
-        String sql = "UPDATE game SET game = ?";
-        var gson = new Gson();
-        try (var connection = DatabaseManager.getConnection()){
-            var pst = connection.prepareStatement(sql);
-            pst.setString(1, gson.toJson(game));
-            int result = pst.executeUpdate();
-        }
-        catch (DataAccessException | SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    public void updateGame(ChessGame game) throws DataAccessException, SQLException {
+//        String sql = "UPDATE game SET game = ?";
+//        var gson = new Gson();
+//        try (var connection = DatabaseManager.getConnection()){
+//            var pst = connection.prepareStatement(sql);
+//            pst.setString(1, gson.toJson(game));
+//            int result = pst.executeUpdate();
+//        }
+//        catch (DataAccessException | SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
 }

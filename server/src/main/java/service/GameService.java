@@ -88,6 +88,9 @@ public class GameService {
         }
         try{
             results = results.setGames(data.getGameDAO().listGames());
+            for(GameData game : results.games()){
+                System.out.println(game.toString());
+            }
             response.status(200);
         }
         catch(Exception e){

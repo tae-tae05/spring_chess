@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.Server;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
@@ -99,6 +100,13 @@ public class GameDAOTests {
         GameData temp = new GameData(34, null, null, "testing null", new ChessGame());
         gameDAO.addGame(temp);
         gameDAO.insertUsername(temp.gameID(), "whiteUser", ChessGame.TeamColor.WHITE);
+        String sql = "SELECT whiteUsername FROM game WHERE gameID= '" + 34 + "'";
+        try (var connection = DatabaseManager.getConnection()) {
+            var pst = connection.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            rs.next();
+            System.out.println(rs.getString("whiteUsername"));
+        }
         Assertions.assertFalse(gameDAO.verifyWhitePosition(temp.gameID()));
     }
     @Test
