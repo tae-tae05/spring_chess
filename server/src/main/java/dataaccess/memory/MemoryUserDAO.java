@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class MemoryUserDAO implements UserDAO {
-    public Collection<UserData> USERS = new ArrayList<>();
+    public Collection<UserData> users = new ArrayList<>();
     @Override
     public boolean getUser(UserData user) {
-        for(UserData current: USERS){
+        for(UserData current: users){
             if(current.username().equals(user.username())){
                 return true;
                 //returns true if it exists
@@ -22,7 +22,7 @@ public class MemoryUserDAO implements UserDAO {
         //returns false if it does not exist
     }
     public boolean checkUser(String username, String password) {
-        for(UserData current: USERS) {
+        for(UserData current: users) {
             if (current.username().equals(username) && current.password().equals(password)) {
                 return true;
             }
@@ -36,17 +36,17 @@ public class MemoryUserDAO implements UserDAO {
         if(getUser(user)) {
             throw new DataAccessException("failed");
         }
-        USERS.add(user);
+        users.add(user);
     }
 
 
     @Override
     public void deleteUsers() throws DataAccessException, SQLException {
-        USERS.clear();
+        users.clear();
     }
 
     @Override
     public Collection<UserData> getAllUsers() {
-        return USERS;
+        return users;
     }
 }

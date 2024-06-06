@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class MySQLUserDAO implements UserDAO {
-    private static String SALT = BCrypt.gensalt();
+    private static String salt = BCrypt.gensalt();
 
     public MySQLUserDAO() throws DataAccessException, SQLException {
     }
@@ -64,7 +64,7 @@ public class MySQLUserDAO implements UserDAO {
 
     @Override
     public void createUser(UserData user) throws DataAccessException, SQLException {
-        String hashPassword = BCrypt.hashpw(user.password(), SALT);
+        String hashPassword = BCrypt.hashpw(user.password(), salt);
         String sql = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
         try (var connection = DatabaseManager.getConnection()) {
             var pst = connection.prepareStatement(sql);

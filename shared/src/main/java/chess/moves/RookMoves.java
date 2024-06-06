@@ -10,34 +10,31 @@ public class RookMoves implements MovesCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor current) {
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
-        Collection<ChessMove> addMoves = tempMoves(row, col, 1, 0, board, myPosition, current);
-        Collection<ChessMove> moves = new ArrayList<>(addMoves);
-        Collection<ChessMove> addMoves1 = tempMoves(row, col, -1, 0, board, myPosition, current);
-        moves.addAll(addMoves1);
-        Collection<ChessMove> addMoves2 = tempMoves(row, col, 0, 1, board, myPosition, current);
-        moves.addAll(addMoves2);
-        Collection<ChessMove> addMoves3 = tempMoves(row, col, 0, -1, board, myPosition, current);
-        moves.addAll(addMoves3);
+        Collection<ChessMove> moves = new ArrayList<>();
+        moves.addAll(rookMoves(row, col, 1, 0, board, myPosition, current));
+        moves.addAll(rookMoves(row, col, -1, 0, board, myPosition, current));
+        moves.addAll(rookMoves(row, col, 0, 1, board, myPosition, current));
+        moves.addAll(rookMoves(row, col, 0, -1, board, myPosition, current));
         return moves;
     }
 
-    public Collection<ChessMove> tempMoves(int row, int col, int p, int j, ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor current){
+    public Collection<ChessMove> rookMoves(int row, int col, int p, int j, ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor current){
         Collection<ChessMove> moves = new ArrayList<>();
         for(int i = 1; i < 9; i++){
-            int a = p * i;
-            int b = j * i;
-            if(isValid(row+a, col+b)){
-                ChessPosition next = new ChessPosition(row+a, col+b);
+            int b = p * i;
+            int c = j * i;
+            if(isValid(row+b, col+c)){
+                ChessPosition next = new ChessPosition(row+b, col+c);
                 if(board.getPiece(next) == null){
-                    ChessMove tempMove = new ChessMove(myPosition, next, null);
-                    moves.add(tempMove);
+                    ChessMove rookMove = new ChessMove(myPosition, next, null);
+                    moves.add(rookMove);
                 }
                 else if(board.getPiece(next) != null) {
                     if (board.getPiece(next).getTeamColor() == current) {
                         break;
                     }
-                    ChessMove tempMove = new ChessMove(myPosition, next, null);
-                    moves.add(tempMove);
+                    ChessMove rookMove = new ChessMove(myPosition, next, null);
+                    moves.add(rookMove);
                     break;
                 }
             }

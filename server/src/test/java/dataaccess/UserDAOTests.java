@@ -17,7 +17,6 @@ public class UserDAOTests {
         try {
             userDAO = new MySQLUserDAO();
 
-            // Create DB if not exists
             DatabaseManager.createDatabase();
 
         } catch (DataAccessException | SQLException e) {
@@ -26,12 +25,7 @@ public class UserDAOTests {
     }
     private final UserData one = new UserData("jin", "taetae", "jin@email.com");
     private final UserData two = new UserData("jj", "arayofj", "jj@email.com");
-
     private final UserData three = new UserData("bin", "binnythepooh", "binny@email.com");
-
-//    static Connection getConnection() throws SQLException {
-//        return DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "redhat@05");
-//    }
 
     @BeforeEach
     public void setUp() throws SQLException, DataAccessException {
