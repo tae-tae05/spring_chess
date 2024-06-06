@@ -21,22 +21,22 @@ public class BishopMoves implements MovesCalculator {
         return moves;
     }
 
-    public Collection<ChessMove> bishopMoves(int row, int col, int p, int j, ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor current){
+    public Collection<ChessMove> bishopMoves(int row, int col, int t, int y, ChessBoard board, ChessPosition position, ChessGame.TeamColor current){
         Collection<ChessMove> moves = new ArrayList<>();
         for(int i = 1; i < 9; i++){
-            int a = p * i;
-            int b = j * i;
+            int a = t * i;
+            int b = y * i;
             if(isValid(row+a, col+b)){
                 ChessPosition next = new ChessPosition(row+a, col+b);
                 if(board.getPiece(next) == null){
-                    ChessMove bishopMove = new ChessMove(myPosition, next, null);
+                    ChessMove bishopMove = new ChessMove(position, next, null);
                     moves.add(bishopMove);
                 }
                 else if(board.getPiece(next) != null) {
                     if (board.getPiece(next).getTeamColor() == current) {
                         break;
                     }
-                    ChessMove bishopMove = new ChessMove(myPosition, next, null);
+                    ChessMove bishopMove = new ChessMove(position, next, null);
                     moves.add(bishopMove);
                     break;
                 }

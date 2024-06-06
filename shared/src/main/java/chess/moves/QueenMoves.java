@@ -22,22 +22,22 @@ public class QueenMoves implements MovesCalculator {
         return moves;
     }
 
-    public Collection<ChessMove> queenMoves(int row, int col, int p, int j, ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor current){
+    public Collection<ChessMove> queenMoves(int row, int col, int a, int b, ChessBoard board, ChessPosition thisPosition, ChessGame.TeamColor current){
         Collection<ChessMove> moves = new ArrayList<>();
         for(int i = 1; i < 9; i++){
-            int q = p * i;
-            int q1 = j * i;
+            int q = a * i;
+            int q1 = b * i;
             if(isValid(row+q, col+q1)){
                 ChessPosition next = new ChessPosition(row+q, col+q1);
                 if(board.getPiece(next) == null){
-                    ChessMove queenMove = new ChessMove(myPosition, next, null);
+                    ChessMove queenMove = new ChessMove(thisPosition, next, null);
                     moves.add(queenMove);
                 }
                 else if(board.getPiece(next) != null) {
                     if (board.getPiece(next).getTeamColor() == current) {
                         break;
                     }
-                    ChessMove queenMove = new ChessMove(myPosition, next, null);
+                    ChessMove queenMove = new ChessMove(thisPosition, next, null);
                     moves.add(queenMove);
                     break;
                 }

@@ -12,11 +12,11 @@ public class CheckVertical implements Check{
                 }
             }
         }
-        for(int i = row + 1; i < 9; i++){
-            ChessPiece current = board.getPiece(new ChessPosition(i, col));
-            if(current != null){
-                if(current.getPieceType() == ChessPiece.PieceType.QUEEN || current.getPieceType() == ChessPiece.PieceType.ROOK){
-                    return current.getTeamColor() != color;
+        for(int j = row + 1; j < 9; j++){
+            ChessPiece piece = board.getPiece(new ChessPosition(j, col));
+            if(piece != null){
+                if(piece.getPieceType() == ChessPiece.PieceType.ROOK || piece.getPieceType() == ChessPiece.PieceType.QUEEN){
+                    return piece.getTeamColor() != color;
                 }
             }
         }
