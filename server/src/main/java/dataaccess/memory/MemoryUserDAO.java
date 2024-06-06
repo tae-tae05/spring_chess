@@ -21,7 +21,7 @@ public class MemoryUserDAO implements UserDAO {
         return false;
         //returns false if it does not exist
     }
-    public boolean checkUser(String username, String password) throws DataAccessException {
+    public boolean checkUser(String username, String password) {
         for(UserData current: USERS) {
             if (current.username().equals(username) && current.password().equals(password)) {
                 return true;

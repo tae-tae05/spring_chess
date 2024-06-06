@@ -11,6 +11,7 @@ import request.JoinGameRequest;
 import results.*;
 import spark.Response;
 
+import java.sql.SQLException;
 import java.util.Random;
 
 public class GameService {
@@ -22,7 +23,7 @@ public class GameService {
         this.data = data;
     }
 
-    public CreateGameResults createGame(GameData game, AuthData auth, Response response) throws DataAccessException {
+    public CreateGameResults createGame(GameData game, AuthData auth, Response response) throws DataAccessException, SQLException {
         CreateGameResults results = new CreateGameResults();
         if(!data.getAuthDAO().verifyUserAuth(auth)){
             results.setMessage("Error: unauthorized");
@@ -47,7 +48,7 @@ public class GameService {
         }
         return results;
     }
-    public LogoutAndJoinResults joinGame(JoinGameRequest join, AuthData auth, Response response) throws DataAccessException {
+    public LogoutAndJoinResults joinGame(JoinGameRequest join, AuthData auth, Response response) throws DataAccessException, SQLException {
         LogoutAndJoinResults results = new LogoutAndJoinResults(null);
         if(!data.getAuthDAO().verifyUserAuth(auth)){
             results = results.setMessage("Error: unauthorized");
@@ -82,7 +83,7 @@ public class GameService {
         return results;
     }
 
-    public ListGameResults listGames(AuthData auth, Response response){
+    public ListGameResults listGames(AuthData auth, Response response) throws SQLException, DataAccessException {
         ListGameResults results = new ListGameResults(null, null);
         if(!data.getAuthDAO().verifyUserAuth(auth)){
             results = results.setMessage("Error: unauthorized");

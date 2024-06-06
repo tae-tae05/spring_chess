@@ -1,9 +1,6 @@
 package dataaccess.memory;
 
 import dataaccess.*;
-import dataaccess.sql.MySQLAuthDAO;
-import dataaccess.sql.MySQLGameDAO;
-import dataaccess.sql.MySQLUserDAO;
 
 import java.sql.SQLException;
 

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
-import passoff.model.TestUser;
 import server.Server;
 
 import java.sql.SQLException;
@@ -116,5 +115,15 @@ public class UserDAOTests {
         Assertions.assertTrue(userDAO.getUser(one), "user one does not exist");
         Assertions.assertTrue(userDAO.getUser(two), "user two does not exist");
         Assertions.assertFalse(userDAO.getUser(three), "user three does exist");
+    }
+    @Test
+    public void checkUserPass() throws SQLException, DataAccessException {
+        userDAO.createUser(one);
+        Assertions.assertTrue(userDAO.checkUser("jin", "taetae"));
+    }
+    @Test
+    public void checkUserFail() throws SQLException, DataAccessException {
+        userDAO.createUser(one);
+        Assertions.assertFalse(userDAO.checkUser("jin", "hello"));
     }
 }

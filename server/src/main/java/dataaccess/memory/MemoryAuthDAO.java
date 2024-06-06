@@ -22,7 +22,7 @@ public class MemoryAuthDAO implements AuthDAO {
         return false;
     }
     @Override
-    public AuthData deleteAuth(AuthData auth) throws DataAccessException {
+    public void deleteAuth(AuthData auth) throws DataAccessException {
         AuthData remove = new AuthData(null, null);
         if(!verifyUserAuth(auth)){
             throw new DataAccessException("not in database");
@@ -35,7 +35,6 @@ public class MemoryAuthDAO implements AuthDAO {
                 break;
             }
         }
-        return remove;
     }
 
     @Override

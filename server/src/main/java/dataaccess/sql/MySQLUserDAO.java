@@ -21,6 +21,35 @@ public class MySQLUserDAO implements UserDAO {
     }
 
     @Override
+    public boolean checkUser(String username, String password) throws DataAccessException {
+        String sql = "SELECT username FROM user WHERE username= '" + username + "'";
+        try{
+            var connection = DatabaseManager.getConnection();
+            var pst = connection.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            if(!rs.next()){
+                return false;
+            }
+        }
+        catch(SQLException e){
+            throw new DataAccessException(e.getMessage());
+        }
+        sql = "SELECT password FROM user WHERE username= '" + username + "'";
+        String foundPassword = "";
+        try{
+            var connection = DatabaseManager.getConnection();
+            var pst = connection.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+            rs.next();
+            foundPassword = rs.getString("password");
+        }
+        catch(SQLException | DataAccessException e){
+            throw new DataAccessException(e.getMessage());
+        }
+        return BCrypt.checkpw(password, foundPassword);
+    }
+
+    @Override
     public boolean getUser(UserData user) throws DataAccessException, SQLException {
         String find = user.username();
         String sql = "SELECT username FROM user WHERE username= '" + user.username() + "'";
@@ -64,7 +93,6 @@ public class MySQLUserDAO implements UserDAO {
                     SELECT username, password, email FROM user""";
             try(var pst = connection.prepareStatement(findUsers)){
                 var rs = pst.executeQuery();
-                Gson gson = new Gson();
                 while(rs.next()){
                     UserData user = new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
                     allUsers.add(user);

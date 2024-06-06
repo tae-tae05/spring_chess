@@ -4,16 +4,11 @@ import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.memory.MemoryDataAccess;
-import dataaccess.sql.MySQLDAO;
 import dataaccess.sql.MySQLDataAccess;
 import handlers.*;
-import model.UserData;
 import spark.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 
 public class Server {
@@ -79,18 +74,21 @@ public class Server {
             }
 
             var gameTable = """
-                    CREATE TABLE IF NOT EXISTS games (
-                    gameID int NOT NULL,
-                    gameData TEXT NOT NULL,
-                    PRIMARY KEY (gameID)
+                    CREATE TABLE IF NOT EXISTS `game` (
+                    `gameID` INT PRIMARY KEY AUTO_INCREMENT,
+                    `whiteUsername` VARCHAR(64),
+                    `blackUsername` VARCHAR(64),
+                    `gameName` VARCHAR(64) NOT NULL,
+                    `game` LONGTEXT NOT NULL
                     )""";
+
 
             try (var createTable = connection.prepareStatement(gameTable)) {
                 createTable.executeUpdate();
             }
 
             var authTable = """
-                    CREATE TABLE IF NOT EXISTS auths (
+                    CREATE TABLE IF NOT EXISTS auth (
                     authToken VARCHAR(64) NOT NULL,
                     username VARCHAR(64) NOT NULL,
                     PRIMARY KEY (authToken)

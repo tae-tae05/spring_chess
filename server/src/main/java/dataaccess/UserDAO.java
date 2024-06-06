@@ -11,4 +11,6 @@ public interface UserDAO {
     void createUser(UserData user) throws DataAccessException, SQLException; //puts it into database
     void deleteUsers() throws DataAccessException, SQLException;
     Collection<UserData> getAllUsers() throws DataAccessException;
+
+    boolean checkUser(String username, String password) throws DataAccessException;
 }

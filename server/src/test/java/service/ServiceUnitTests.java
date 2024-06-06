@@ -114,7 +114,7 @@ class ServiceUnitTests {
     @Test
     @Order(4)
     @DisplayName("Logout Success")
-    public void logoutSuccess() throws DataAccessException{
+    public void logoutSuccess() throws DataAccessException, SQLException {
         AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
 
         LogoutAndJoinResults logoutResult = userService.logout(auth, RESPONSE);
@@ -125,7 +125,7 @@ class ServiceUnitTests {
     @Test
     @Order(4)
     @DisplayName("Logout Failure")
-    public void logoutFailure() throws DataAccessException {
+    public void logoutFailure() throws DataAccessException, SQLException {
         AuthData unauthorized = new AuthData("984356dsef", "existingUser");
 
         LogoutAndJoinResults logoutResult = userService.logout(unauthorized, RESPONSE);
@@ -160,7 +160,7 @@ class ServiceUnitTests {
     @Test
     @Order(7)
     @DisplayName("Create Game Success")
-    public void createGameSuccess() throws DataAccessException{
+    public void createGameSuccess() throws DataAccessException, SQLException {
         AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
         CreateGameResults gameResults = gameService.createGame(gameOne, auth, RESPONSE);
 
@@ -170,7 +170,7 @@ class ServiceUnitTests {
     @Test
     @Order(8)
     @DisplayName("Create Game Failure")
-    public void failedCreateGame() throws DataAccessException{
+    public void failedCreateGame() throws DataAccessException, SQLException {
         AuthData auth = new AuthData("+9873dadf", "Jin");
         CreateGameResults gameResults = gameService.createGame(gameOne, auth, RESPONSE);
 
@@ -180,7 +180,7 @@ class ServiceUnitTests {
     @Test
     @Order(8)
     @DisplayName("List Games Success")
-    public void listGames() throws DataAccessException{
+    public void listGames() throws DataAccessException, SQLException {
         AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
         ListGameResults results = gameService.listGames(auth, RESPONSE);
 
@@ -190,7 +190,7 @@ class ServiceUnitTests {
     @Test
     @Order(9)
     @DisplayName("List Games Failure")
-    public void listGamesFailed() throws DataAccessException{
+    public void listGamesFailed() throws DataAccessException, SQLException {
         AuthData auth = new AuthData("+9873dadf", "Jin");
         ListGameResults results = gameService.listGames(auth, RESPONSE);
 
@@ -200,7 +200,7 @@ class ServiceUnitTests {
     @Test
     @Order(10)
     @DisplayName("Join Game Success")
-    public void joinedGame() throws DataAccessException{
+    public void joinedGame() throws DataAccessException, SQLException {
         AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
         GameData game = new GameData(null, null, null, "my game", new ChessGame());
         CreateGameResults temp = gameService.createGame(game, auth, RESPONSE);
@@ -214,7 +214,7 @@ class ServiceUnitTests {
     @Test
     @Order(11)
     @DisplayName("Join Game Failure")
-    public void failedJoiningGame() throws DataAccessException{
+    public void failedJoiningGame() throws DataAccessException, SQLException {
 
         AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
         GameData game = new GameData(null, "Jin", null, "my game", new ChessGame());
