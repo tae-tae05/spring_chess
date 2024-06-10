@@ -3,7 +3,6 @@ package ui;
 import com.google.gson.Gson;
 import model.*;
 
-import org.eclipse.jetty.util.IO;
 import request.LoginRequest;
 import results.*;
 import request.*;
@@ -34,10 +33,10 @@ public class ServerFacade {
         return this.carryRequest("POST", path, request, RegisterResults.class, null);
     }
 
-    public LogoutAndJoinResults logout(RegisterResults request) throws ResponseException {
+    public LogoutResults logout(RegisterResults request) throws ResponseException {
         var path = "/session";
         Object auth = new AuthData(request.authToken(), request.username());
-        return this.carryRequest("DELETE", path, auth, LogoutAndJoinResults.class, request);
+        return this.carryRequest("DELETE", path, auth, LogoutResults.class, request);
     }
 
     public CreateGameResults createGame(GameData game, RegisterResults request) throws ResponseException{
@@ -45,9 +44,9 @@ public class ServerFacade {
         return this.carryRequest("POST", path, game, CreateGameResults.class, request);
     }
 
-    public LogoutAndJoinResults joinGame(JoinGameRequest joinRequest, RegisterResults request) throws ResponseException {
+    public LogoutResults joinGame(JoinGameRequest joinRequest, RegisterResults request) throws ResponseException {
         var path = "/game";
-        return this.carryRequest("PUT", path, joinRequest, LogoutAndJoinResults.class, request);
+        return this.carryRequest("PUT", path, joinRequest, LogoutResults.class, request);
     }
 
     public ListGameResults listGames(RegisterResults request) throws ResponseException{
@@ -67,6 +66,7 @@ public class ServerFacade {
             if(login != null){
                 http.addRequestProperty("authorization", login.authToken());
             }
+//            else if()
 
             if (!Objects.equals(endpoint, "GET")) {
                 http.setDoOutput(true);

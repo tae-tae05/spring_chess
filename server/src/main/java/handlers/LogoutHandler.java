@@ -3,7 +3,7 @@ package handlers;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import model.AuthData;
-import results.LogoutAndJoinResults;
+import results.LogoutResults;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -20,7 +20,7 @@ public class LogoutHandler implements Route{
         var serializer = new Gson();
         AuthData auth = new AuthData(request.headers("authorization"), null);
         response.type("application/json");
-        LogoutAndJoinResults logoutResult = logoutService.logout(auth, response);
+        LogoutResults logoutResult = logoutService.logout(auth, response);
         return serializer.toJson(logoutResult);
     }
 }

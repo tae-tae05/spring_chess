@@ -3,10 +3,7 @@ package service;
 import chess.ChessGame;
 import dataaccess.*;
 
-import dataaccess.memory.MemoryAuthDAO;
 import dataaccess.memory.MemoryDataAccess;
-import dataaccess.memory.MemoryGameDAO;
-import dataaccess.memory.MemoryUserDAO;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -117,7 +114,7 @@ class ServiceUnitTests {
     public void logoutSuccess() throws DataAccessException, SQLException {
         AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
 
-        LogoutAndJoinResults logoutResult = userService.logout(auth, RESPONSE);
+        LogoutResults logoutResult = userService.logout(auth, RESPONSE);
 
         Assertions.assertEquals(null, logoutResult.message(), "logout was not successful");
     }
@@ -128,7 +125,7 @@ class ServiceUnitTests {
     public void logoutFailure() throws DataAccessException, SQLException {
         AuthData unauthorized = new AuthData("984356dsef", "existingUser");
 
-        LogoutAndJoinResults logoutResult = userService.logout(unauthorized, RESPONSE);
+        LogoutResults logoutResult = userService.logout(unauthorized, RESPONSE);
 
         Assertions.assertEquals("Error: unauthorized", logoutResult.message(), "logout succeeded");
     }
@@ -205,7 +202,7 @@ class ServiceUnitTests {
         GameData game = new GameData(null, null, null, "my game", new ChessGame());
         CreateGameResults temp = gameService.createGame(game, auth, RESPONSE);
         JoinGameRequest joinRequest = new JoinGameRequest(temp.getGameID(), ChessGame.TeamColor.WHITE);
-        LogoutAndJoinResults joinResults = gameService.joinGame(joinRequest, auth, RESPONSE);
+        LogoutResults joinResults = gameService.joinGame(joinRequest, auth, RESPONSE);
 
         Assertions.assertNull(joinResults.message(), "did not join game successfully");
     }
@@ -220,7 +217,7 @@ class ServiceUnitTests {
         GameData game = new GameData(null, "Jin", null, "my game", new ChessGame());
         CreateGameResults temp = gameService.createGame(game, auth, RESPONSE);
         JoinGameRequest joinRequest = new JoinGameRequest(temp.getGameID(), ChessGame.TeamColor.WHITE);
-        LogoutAndJoinResults joinResults = gameService.joinGame(joinRequest, auth, RESPONSE);
+        LogoutResults joinResults = gameService.joinGame(joinRequest, auth, RESPONSE);
 
         Assertions.assertNotNull(joinResults.message(), "joined successfully");
     }

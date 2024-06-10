@@ -45,8 +45,8 @@ public class GameService {
         }
         return results;
     }
-    public LogoutAndJoinResults joinGame(JoinGameRequest join, AuthData auth, Response response) throws DataAccessException, SQLException {
-        LogoutAndJoinResults results = new LogoutAndJoinResults(null);
+    public LogoutResults joinGame(JoinGameRequest join, AuthData auth, Response response) throws DataAccessException, SQLException {
+        LogoutResults results = new LogoutResults(null);
         if(!data.getAuthDAO().verifyUserAuth(auth)){
             results = results.setMessage("Error: unauthorized");
             response.status(401);

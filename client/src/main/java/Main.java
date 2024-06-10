@@ -1,5 +1,4 @@
 import chess.ChessGame;
-import com.mysql.cj.log.Log;
 import model.*;
 import request.*;
 import results.*;
@@ -43,16 +42,14 @@ public class Main {
                         System.out.print("[LOGGED OUT] >>> ");
                     }
                     case "register" -> {
-                        UserData registerRequest = new UserData(null, null, null);
+                        UserData registerRequest;
                         if (inputs.length == 4) { // tokens are correct length
                             registerRequest = new UserData(inputs[1], inputs[2], inputs[3]);
                             try {
                                 loginResult = serverFacade.register(registerRequest);
-                                serverFacade.register(registerRequest);
                                 loginStatus = true;
                                 System.out.println("You have successfully registered! Welcome.");
-                                System.out.print("[LOGGED IN] >>>");
-
+                                System.out.print("[LOGGED IN] >>> ");
                             } catch (ResponseException e) {
                                 System.out.println(e.getMessage());
                                 System.out.print("[LOGGED OUT] >>>");
@@ -60,8 +57,8 @@ public class Main {
                         }
                         else{
                             System.out.println("you have not provided enough information. type 'help' for specific commands.");
+                            System.out.print("[LOGGED OUT] >>> ");
                         }
-                        System.out.print("[LOGGED IN] >>> ");
                     }
                     case "login" -> {
                         if(inputs.length == 3){
@@ -69,7 +66,7 @@ public class Main {
                             try {
                                 loginResult = serverFacade.login(loginRequest);
                                 System.out.println("Success! You are now logged in.");
-                                System.out.print("[LOGGED IN] >>>");
+                                System.out.print("[LOGGED IN] >>> ");
                                 loginStatus = true;
                             }
                             catch (ResponseException e) {
@@ -90,25 +87,28 @@ public class Main {
                 }
             }
             else{
-                System.out.print("[LOGGED IN] >>>");
                 switch (nextStep) {
                     case "logout" -> {
                         if(inputs.length == 1){
                             try {
-                                LogoutAndJoinResults logout = serverFacade.logout(loginResult);
+                                LogoutResults logout = serverFacade.logout(loginResult);
                                 loginStatus = false;
                                 System.out.println("You have successfully logged out.");
+                                System.out.print("[LOGGED OUT] >>> ");
                             }
                             catch (ResponseException e) {
                                 System.out.println(e.getMessage());
+                                System.out.print("[LOGGED IN] >>> ");
                             }
                         }
                         else {
                             System.out.println("input is incorrect. type 'help' for specific commands.");
+                            System.out.print("[LOGGED IN] >>> ");
                         }
                     }
                     case "help" -> {
                         help.printAfterLogin();
+                        System.out.print("[LOGGED IN] >>> ");
                     }
                     case "create" -> {
                         GameData game = new GameData(null, null, null, null, new ChessGame());
@@ -122,8 +122,9 @@ public class Main {
                             System.out.println("Game has succesfully been created. The game id is " + createGame.getGameID());
                         }
                         else {
-                            System.out.println("input was not current. Enter help for specific commands");
+                            System.out.println("input was not correct. Enter help for specific commands");
                         }
+                        System.out.print("[LOGGED IN] >>> ");
                     }
                     case "join" -> {
                         JoinGameRequest joinRequest = new JoinGameRequest();
@@ -138,13 +139,20 @@ public class Main {
                             try{
                                 serverFacade.joinGame(joinRequest, loginResult);
                                 System.out.println("You have joined successfully!");
+                                listGame = serverFacade.listGames(loginResult);
+                                for(GameData currentGame: listGame.games()) {
+                                    if (Objects.equals(String.valueOf(currentGame.gameID()), inputs[1])) {
+                                        printBoard.printBoard(currentGame.game());
+                                    }
+                                }
                             } catch (ResponseException e) {
                                 System.out.println("failed to join game -> " + e.getMessage());
                             }
                         }
                         else {
-                            System.out.println("input was not current. Enter help for specific commands");
+                            System.out.println("input was not correct. Enter help for specific commands");
                         }
+                        System.out.print("[LOGGED IN] >>> ");
                     }
                     case "list" -> {
                         if(inputs.length == 1){
@@ -157,8 +165,9 @@ public class Main {
                             }
                         }
                         else {
-                            System.out.println("input was not current. Enter help for specific commands");
+                            System.out.println("input was not correct. Enter help for specific commands");
                         }
+                        System.out.print("[LOGGED IN] >>> ");
 
                     }
                     case "observe" -> {
@@ -168,7 +177,6 @@ public class Main {
                                 listGame = serverFacade.listGames(loginResult);
                                 for(GameData game: listGame.games()){
                                     if(Objects.equals(String.valueOf(game.gameID()), inputs[1])){
-                                        System.out.println("found a matching board");
                                         printBoard.printBoard(game.game());
                                         foundGame = true;
                                     }
@@ -180,14 +188,16 @@ public class Main {
                             } catch (ResponseException e) {
                                 System.out.println("unable to observe game -> " + e.getMessage());
                             }
+                            System.out.print("[LOGGED IN] >>> ");
                         }
                     }
                     case "quit" -> {
                         try {
-                            LogoutAndJoinResults logout = serverFacade.logout(loginResult);
+                            LogoutResults logout = serverFacade.logout(loginResult);
+                            System.out.println("Thanks for playing!");
                         } catch (ResponseException e) {
                             System.out.println("failed to quit -> " + e.getMessage());
-                            System.out.print(">>> ");
+                            System.out.print("[LOGGED IN] >>> ");
                         }
                         loginStatus = false;
                         keepRunning = false;

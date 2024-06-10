@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import model.AuthData;
 import request.JoinGameRequest;
-import results.LogoutAndJoinResults;
+import results.LogoutResults;
 import service.GameService;
 import spark.Request;
 import spark.Response;
@@ -23,7 +23,7 @@ public class JoinGameHandler implements Route {
         AuthData auth = new AuthData(request.headers("authorization"), null);
         response.type("application/json");
 
-        LogoutAndJoinResults results = joinGame.joinGame(currentGame ,auth, response);
+        LogoutResults results = joinGame.joinGame(currentGame ,auth, response);
         return serializer.toJson(results);
     }
 }

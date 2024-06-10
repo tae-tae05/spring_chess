@@ -3,11 +3,9 @@ package service;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.memory.MemoryAuthDAO;
-import dataaccess.memory.MemoryUserDAO;
 import model.AuthData;
 import request.LoginRequest;
-import results.LogoutAndJoinResults;
+import results.LogoutResults;
 import results.RegisterResults;
 import spark.Response;
 
@@ -47,9 +45,9 @@ public class UserService {
 
         return regResults;
     }
-    public LogoutAndJoinResults logout(AuthData auth, Response response) throws DataAccessException, SQLException {
+    public LogoutResults logout(AuthData auth, Response response) throws DataAccessException, SQLException {
         var serializer = new Gson();
-        LogoutAndJoinResults logoutResult = new LogoutAndJoinResults(null);
+        LogoutResults logoutResult = new LogoutResults(null);
         if(!data.getAuthDAO().verifyUserAuth(auth)){
             logoutResult = logoutResult.setMessage("Error: unauthorized");
             response.status(401);
