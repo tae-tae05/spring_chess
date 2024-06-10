@@ -36,12 +36,13 @@ public class Main {
                     }
                     case "register" -> {
                         UserData registerRequest = new UserData(null, null, null);
-                        RegisterResults registerResults;
+//                        RegisterResults registerResults;
                         if (inputs.length == 4) { // tokens are correct length
                             registerRequest = new UserData(inputs[1], inputs[2], inputs[3]);
                             try {
-                                System.out.println("request - request");
-                                registerResults = serverFacade.register(registerRequest);
+//                                registerResults = serverFacade.register(registerRequest);
+                                serverFacade.register(registerRequest);
+                                loginStatus = true;
 
                             } catch (ResponseException e) {
                                 System.out.println("could not get results -> " + e.getMessage());
@@ -56,10 +57,13 @@ public class Main {
                         if(inputs.length == 3){
                             loginRequest = new LoginRequest(inputs[1], inputs[2]);
                             try {
-                                System.out.println("request - login");
 //                                loginResult = serverFacade.login(loginRequest);
-                            } catch (Exception e){
-                                System.out.println(e.getMessage());
+                                serverFacade.login(loginRequest);
+                                System.out.println("Success! You are now logged in.");
+                                loginStatus = true;
+                            }
+                            catch (ResponseException e) {
+                                System.out.println("failed to login -> " + e.getMessage());
                             }
                         }
                         else{
@@ -73,8 +77,34 @@ public class Main {
                 }
             }
             else{
-                System.out.println("implement login part");
+                switch (nextStep) {
+                    case "logout" -> {
+                        System.out.println("authorized logout");
+                    }
+                    case "help" -> {
+                        help.printAfterLogin();
+                    }
+                    case "create" -> {
+                        System.out.println("authorized create");
+                    }
+                    case "join" -> {
+                        System.out.println("authorized join");
+                    }
+                    case "list" -> {
+                        System.out.println("authorized list");
+                    }
+                    case "observe" -> {
+                        System.out.println("authorized observe");
+                    }
+                    case "quit" -> {
+                        System.out.println("authorized quit");
+                    }
+                    default -> {
+                        System.out.println(nextStep + " is not a valid command, please type 'help' for a list of commands");
+                    }
+                }
             }
         }
+        //clear auth table?
     }
 }

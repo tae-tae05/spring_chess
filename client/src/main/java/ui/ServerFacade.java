@@ -33,6 +33,11 @@ public class ServerFacade {
         return this.carryRequest("POST", path, request, UserData.class);
     }
 
+    public LogoutAndJoinResults logout(LoginRequest request) throws ResponseException {
+        var path = "/session";
+        return this.carryRequest("DELETE", path, request, LogoutAndJoinResults.class);
+    }
+
 
     private <T> T carryRequest(String endpoint, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
