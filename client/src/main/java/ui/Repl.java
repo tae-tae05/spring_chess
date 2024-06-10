@@ -213,7 +213,7 @@ public class Repl {
         return join;
     }
 
-    private void Observing(RegisterResults request, String gameID){
+    private void observing(RegisterResults request, String gameID){
         try {
             boolean foundGame = false;
             listGame = serverFacade.listGames(loginResult);
