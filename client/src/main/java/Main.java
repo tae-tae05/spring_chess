@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws ResponseException {
+        PrintingChessBoard printBoard = new PrintingChessBoard();
         PrintingHelp help = new PrintingHelp();
         RegisterResults loginResult = null;
         LoginRequest loginRequest;
@@ -143,9 +144,13 @@ public class Main {
                                 System.out.println("unable to list games -> " + e.getMessage());
                             }
                         }
+                        else {
+                            System.out.println("input was not current. Enter help for specific commands");
+                        }
 
                     }
                     case "observe" -> {
+                        //display the chessboard of the called game
                         System.out.println("authorized observe");
                     }
                     case "quit" -> {
