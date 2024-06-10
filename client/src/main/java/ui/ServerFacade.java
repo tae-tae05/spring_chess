@@ -3,6 +3,7 @@ package ui;
 import com.google.gson.Gson;
 import model.UserData;
 import org.eclipse.jetty.util.IO;
+import request.LoginRequest;
 import results.*;
 //import requests.*;
 
@@ -12,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Objects;
 
 import static java.nio.file.Files.readString;
 
@@ -25,21 +27,26 @@ public class ServerFacade {
 
     public RegisterResults register(UserData request) throws ResponseException {
         var path = "/user";
-        return this.carryRequest("POST", path, request, UserData.class);;
+        return this.carryRequest("POST", path, request, RegisterResults.class);
+    }
+    public UserData login(LoginRequest request) throws ResponseException {
+        var path = "/session";
+        return this.carryRequest("POST", path, request, UserData.class);
     }
 
 
     private <T> T carryRequest(String endpoint, String method, Object request, Class<T> responseClass) throws ResponseException {
         try {
             var json = new Gson();
-
             URL url = new URI(this.url + endpoint).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            //post, get, delete, etc.
             http.setRequestMethod(method);
 
             http.connect();
 
-            if (!(http.getResponseCode() / 100 == 2)) {
+            if (http.getResponseCode() != 200) {
+                System.out.println("http response code was not corrent\n");
                 throw new ResponseException("Response code: " + http.getResponseCode() + ", message: " + http.getResponseMessage());
             }
 
@@ -53,10 +60,9 @@ public class ServerFacade {
     private static <T> T readString(HttpURLConnection http, Class<T> responseClass) throws IOException {
         T response = null;
         var json = new Gson();
-        if(http.getContentLength() < 0){
+        if(http.getContentLength() > 0){
             try (InputStream body = http.getInputStream()){
                 InputStreamReader read = new InputStreamReader(body);
-                char[] message = new char[1000];
                 if(responseClass != null){
                     response = json.fromJson(read, responseClass);
                 }
