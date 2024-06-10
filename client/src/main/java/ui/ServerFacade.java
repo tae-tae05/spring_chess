@@ -1,11 +1,12 @@
 package ui;
 
 import com.google.gson.Gson;
-import model.UserData;
+import model.*;
+
 import org.eclipse.jetty.util.IO;
 import request.LoginRequest;
 import results.*;
-//import requests.*;
+import request.*;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -26,36 +27,53 @@ public class ServerFacade {
 
     public RegisterResults register(UserData request) throws ResponseException {
         var path = "/user";
-        return this.carryRequest("POST", path, request, RegisterResults.class);
+        return this.carryRequest("POST", path, request, RegisterResults.class, null);
     }
-    public UserData login(LoginRequest request) throws ResponseException {
+    public RegisterResults login(LoginRequest request) throws ResponseException {
         var path = "/session";
-        return this.carryRequest("POST", path, request, UserData.class);
+        return this.carryRequest("POST", path, request, RegisterResults.class, null);
     }
 
-    public LogoutAndJoinResults logout(LoginRequest request) throws ResponseException {
+    public LogoutAndJoinResults logout(RegisterResults request) throws ResponseException {
         var path = "/session";
-        return this.carryRequest("DELETE", path, request, LogoutAndJoinResults.class);
+        Object auth = new AuthData(request.authToken(), request.username());
+        return this.carryRequest("DELETE", path, auth, LogoutAndJoinResults.class, request);
     }
 
+    public CreateGameResults createGame(GameData game, RegisterResults request) throws ResponseException{
+        var path = "/game";
+        return this.carryRequest("POST", path, game, CreateGameResults.class, request);
+    }
 
-    private <T> T carryRequest(String endpoint, String path, Object request, Class<T> responseClass) throws ResponseException {
+    public LogoutAndJoinResults joinGame(JoinGameRequest joinRequest, RegisterResults request) throws ResponseException {
+        var path = "/game";
+        return this.carryRequest("PUT", path, joinRequest, LogoutAndJoinResults.class, request);
+    }
+
+    public ListGameResults listGames(RegisterResults request) throws ResponseException{
+        var path = "/game";
+        return this.carryRequest("GET", path, request, ListGameResults.class, request);
+    }
+
+    private <T> T carryRequest(String endpoint, String path, Object request, Class<T> responseClass, RegisterResults login) throws ResponseException {
         try {
             var json = new Gson();
-//            System.out.println(this.url);
             URL url = new URI(this.url + path).toURL();
-//            System.out.println("2");    // FIXME: Delete me
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
 
             //post, get, delete, etc.
             http.setRequestMethod(endpoint);
 
+            if(login != null){
+                http.addRequestProperty("authorization", login.authToken());
+            }
+
             if (!Objects.equals(endpoint, "GET")) {
                 http.setDoOutput(true);
                 write(http, request);
             }
-
             http.connect();
+
 
             if (http.getResponseCode() != 200) {
                 System.out.println("http response code was not correct\n");
@@ -87,7 +105,7 @@ public class ServerFacade {
         //response
         T response = null;
         var json = new Gson();
-        if(http.getContentLength() > 0){
+        if(http.getContentLength() < 0){
             try (InputStream body = http.getInputStream()){
                 InputStreamReader read = new InputStreamReader(body);
                 if(responseClass != null){

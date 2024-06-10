@@ -30,4 +30,11 @@ public class JoinGameRequest{
     public ChessGame.TeamColor getTeamColor(){
         return playerColor;
     }
+
+    public void setGameID(Integer newID){
+        this.gameID = newID;
+    }
+    public void setTeamColor(ChessGame.TeamColor color){
+        this.playerColor = color;
+    }
 }

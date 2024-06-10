@@ -1,3 +1,4 @@
+import chess.ChessGame;
 import com.mysql.cj.log.Log;
 import model.*;
 import request.*;
@@ -7,10 +8,12 @@ import ui.*;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ResponseException {
         PrintingHelp help = new PrintingHelp();
-        UserData loginResult = null;
-
+        RegisterResults loginResult = null;
+        LoginRequest loginRequest;
+        CreateGameResults createGame = new CreateGameResults();
+        ListGameResults listGame = new ListGameResults(null, null);
         Server server = new Server();
         var port = server.run(0);
 //        System.out.println("http://localhost:" + port);
@@ -40,9 +43,10 @@ public class Main {
                         if (inputs.length == 4) { // tokens are correct length
                             registerRequest = new UserData(inputs[1], inputs[2], inputs[3]);
                             try {
-//                                registerResults = serverFacade.register(registerRequest);
+                                loginResult = serverFacade.register(registerRequest);
                                 serverFacade.register(registerRequest);
                                 loginStatus = true;
+                                System.out.println("You have successfully registered! Welcome.");
 
                             } catch (ResponseException e) {
                                 System.out.println("could not get results -> " + e.getMessage());
@@ -53,12 +57,10 @@ public class Main {
                         }
                     }
                     case "login" -> {
-                        LoginRequest loginRequest;
                         if(inputs.length == 3){
                             loginRequest = new LoginRequest(inputs[1], inputs[2]);
                             try {
-//                                loginResult = serverFacade.login(loginRequest);
-                                serverFacade.login(loginRequest);
+                                loginResult = serverFacade.login(loginRequest);
                                 System.out.println("Success! You are now logged in.");
                                 loginStatus = true;
                             }
@@ -79,25 +81,82 @@ public class Main {
             else{
                 switch (nextStep) {
                     case "logout" -> {
-                        System.out.println("authorized logout");
+                        if(inputs.length == 1){
+                            try {
+                                LogoutAndJoinResults logout = serverFacade.logout(loginResult);
+                                loginStatus = false;
+                                System.out.println("You have successfully logged out.");
+                            }
+                            catch (ResponseException e) {
+                                System.out.println("logout error ->" + e.getMessage());
+                            }
+                        }
+                        else {
+                            System.out.println("input is incorrect. type 'help' for specific commands.");
+                        }
                     }
                     case "help" -> {
                         help.printAfterLogin();
                     }
                     case "create" -> {
-                        System.out.println("authorized create");
+                        GameData game = new GameData(null, null, null, null, new ChessGame());
+                        if(inputs.length == 2){
+                            game = game.setGameName(inputs[1]);
+                            try{
+                                createGame = serverFacade.createGame(game, loginResult);
+                            } catch (ResponseException e) {
+                                System.out.println("Unable to create game -> " + e.getMessage());
+                            }
+                            System.out.println("Game has succesfully been created. The game id is " + createGame.getGameID());
+                        }
+                        else {
+                            System.out.println("input was not current. Enter help for specific commands");
+                        }
                     }
                     case "join" -> {
-                        System.out.println("authorized join");
+                        JoinGameRequest joinRequest = new JoinGameRequest();
+                        if(inputs.length == 3){
+                            joinRequest.setGameID(Integer.valueOf(inputs[1]));
+                            if(inputs[2].equals("WHITE")){
+                                joinRequest.setTeamColor(ChessGame.TeamColor.WHITE);
+                            }
+                            else if (inputs[2].equals("BLACK")){
+                                joinRequest.setTeamColor(ChessGame.TeamColor.BLACK);
+                            }
+                            try{
+                                serverFacade.joinGame(joinRequest, loginResult);
+                                System.out.println("You have joined successfully!");
+                            } catch (ResponseException e) {
+                                System.out.println("failed to join game -> " + e.getMessage());
+                            }
+                        }
+                        else {
+                            System.out.println("input was not current. Enter help for specific commands");
+                        }
                     }
                     case "list" -> {
-                        System.out.println("authorized list");
+                        if(inputs.length == 1){
+                            try {
+                                listGame = serverFacade.listGames(loginResult);
+                            }
+                            catch (ResponseException e){
+                                System.out.println("unable to list games -> " + e.getMessage());
+                            }
+                        }
+
                     }
                     case "observe" -> {
                         System.out.println("authorized observe");
                     }
                     case "quit" -> {
-                        System.out.println("authorized quit");
+                        try {
+                            LogoutAndJoinResults logout = serverFacade.logout(loginResult);
+                        } catch (ResponseException e) {
+                            System.out.println("failed to quit -> " + e.getMessage());
+                            System.out.print(">>> ");
+                        }
+                        loginStatus = false;
+                        keepRunning = false;
                     }
                     default -> {
                         System.out.println(nextStep + " is not a valid command, please type 'help' for a list of commands");
@@ -105,6 +164,6 @@ public class Main {
                 }
             }
         }
-        //clear auth table?
+        System.exit(0);
     }
 }
