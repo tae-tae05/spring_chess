@@ -63,7 +63,7 @@ public class ServerFacade {
 
             //post, get, delete, etc.
             http.setRequestMethod(endpoint);
-
+            //|| (Objects.equals(path, "/session") && endpoint.equals("POST"))
             if(login != null){
                 http.addRequestProperty("authorization", login.authToken());
             }

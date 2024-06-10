@@ -24,6 +24,7 @@ public class Main {
         boolean keepRunning = true;
         boolean loginStatus = false;
         System.out.println("Welcome to Chess. Type help to get started.");
+        System.out.print("[LOGGED OUT] >>> ");
         Scanner scanner = new Scanner(System.in);
         while (keepRunning) {
             //getting input and splitting it
@@ -35,9 +36,11 @@ public class Main {
                 switch (nextStep) {
                     case "quit" -> {
                         keepRunning = false;
+                        System.out.println("System will now close.");
                     }
                     case "help" -> {
                         help.printBeforeLogin();
+                        System.out.print("[LOGGED OUT] >>> ");
                     }
                     case "register" -> {
                         UserData registerRequest = new UserData(null, null, null);
@@ -48,14 +51,17 @@ public class Main {
                                 serverFacade.register(registerRequest);
                                 loginStatus = true;
                                 System.out.println("You have successfully registered! Welcome.");
+                                System.out.print("[LOGGED IN] >>>");
 
                             } catch (ResponseException e) {
-                                System.out.println("could not get results -> " + e.getMessage());
+                                System.out.println(e.getMessage());
+                                System.out.print("[LOGGED OUT] >>>");
                             }
                         }
                         else{
                             System.out.println("you have not provided enough information. type 'help' for specific commands.");
                         }
+                        System.out.print("[LOGGED IN] >>> ");
                     }
                     case "login" -> {
                         if(inputs.length == 3){
@@ -63,23 +69,28 @@ public class Main {
                             try {
                                 loginResult = serverFacade.login(loginRequest);
                                 System.out.println("Success! You are now logged in.");
+                                System.out.print("[LOGGED IN] >>>");
                                 loginStatus = true;
                             }
                             catch (ResponseException e) {
                                 System.out.println("failed to login -> " + e.getMessage());
+                                System.out.print("[LOGGED OUT] >>> ");
                             }
                         }
                         else{
                             System.out.println("you have not provided enough information. type 'help' for specific commands.");
+                            System.out.print("[LOGGED OUT] >>> ");
                         }
                     }
                     default -> {
                         System.out.println(nextStep + " is not a valid command, please type 'help' for a list of commands");
+                        System.out.print("[LOGGED OUT] >>> ");
                     }
 
                 }
             }
             else{
+                System.out.print("[LOGGED IN] >>>");
                 switch (nextStep) {
                     case "logout" -> {
                         if(inputs.length == 1){
@@ -89,7 +100,7 @@ public class Main {
                                 System.out.println("You have successfully logged out.");
                             }
                             catch (ResponseException e) {
-                                System.out.println("logout error ->" + e.getMessage());
+                                System.out.println(e.getMessage());
                             }
                         }
                         else {
