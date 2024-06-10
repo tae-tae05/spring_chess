@@ -17,7 +17,8 @@ public class Main {
         LoginRequest loginRequest;
         CreateGameResults createGame = new CreateGameResults();
         ListGameResults listGame = new ListGameResults(null, null);
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        String url = "http://localhost:8080";
+        ServerFacade serverFacade = new ServerFacade(url);
         boolean keepRunning = true;
         boolean loginStatus = false;
         System.out.println("Welcome to Chess. Type help to get started.");

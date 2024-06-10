@@ -28,8 +28,6 @@ public class ServerFacadeTests {
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         serverFacade = new ServerFacade("http://localhost:" + port);
-//        ClearResults cleared = serverFacade.clearAll(results);
-//        results = serverFacade.register(user);
     }
 
     @BeforeEach
