@@ -2,20 +2,13 @@ package ui;
 
 import chess.ChessBoard;
 import chess.*;
+import model.GameData;
 
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
 public class PrintingChessBoard {
-    Color blackPiece = new Color(0, 0, 0);
-    Color whitePiece = new Color(255, 255, 255);
-    Color lightSquares = new Color(223, 223, 223);
-    Color darkSquares = new Color(91, 91, 91);
-    Color outlineText = new Color(0, 0, 0);
-    Color whiteTeamText = new Color(242, 89, 89);
-    Color blackTeamText = new Color(0,0, 153);
-
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLACK = "\u001B[30m";
     public static final String ANSI_WHITE = "\u001B[37m";
@@ -46,18 +39,7 @@ public class PrintingChessBoard {
         for (int r = 8; r > 0; r--) {
             System.out.print(" " + whiteRow + " ");
             for (int c = 1; c < 9; c++) {
-                if ((r + c) % 2 != 0) {
-                    backgroundColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
-                } else {
-                    backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
-                }
-                ChessPiece piece = game.getBoard().getPiece(new ChessPosition(r, c));
-                if (piece == null) {
-                    System.out.print(backgroundColor + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
-                }
-                else{
-                    printPiece(piece, turnColor, backgroundColor);
-                }
+                printHelper(r, c, game, turnColor);
             }
             System.out.print(" " + whiteRow + " ");
             whiteRow--;
@@ -71,18 +53,7 @@ public class PrintingChessBoard {
         for (int r = 1; r < 9; r++) {
             System.out.print(" " + blackRow + " ");
             for (int c = 8; c > 0; c--) {
-                if ((r + c) % 2 != 0) {
-                    backgroundColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
-                } else {
-                    backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
-                }
-                ChessPiece piece = game.getBoard().getPiece(new ChessPosition(r, c));
-                if (piece == null) {
-                    System.out.print(backgroundColor + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
-                }
-                else{
-                    printPiece(piece, turnColor, backgroundColor);
-                }
+                printHelper(r, c, game, turnColor);
             }
             System.out.print(" " + blackRow + " ");
             blackRow++;
@@ -90,6 +61,22 @@ public class PrintingChessBoard {
         }
         printOutlineText(ChessGame.TeamColor.BLACK);
         System.out.println();
+    }
+
+    public void printHelper(int row, int col, ChessGame game, ChessGame.TeamColor turnColor){
+        String backgroundColor;
+        if ((row + col) % 2 != 0) {
+            backgroundColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+        } else {
+            backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+        }
+        ChessPiece piece = game.getBoard().getPiece(new ChessPosition(row, col));
+        if (piece == null) {
+            System.out.print(backgroundColor + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
+        }
+        else{
+            printPiece(piece, turnColor, backgroundColor);
+        }
     }
 
     public void printPiece(ChessPiece piece, ChessGame.TeamColor color, String backgroundColor){
