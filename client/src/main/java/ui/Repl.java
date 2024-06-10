@@ -134,7 +134,7 @@ public class Repl {
                     }
                     case "observe" -> {
                         if (inputs.length == 2) {
-                            Observing(loginResult, inputs[1]);
+                            observing(loginResult, inputs[1]);
                         }
                     }
                     case "quit" -> {
