@@ -7,12 +7,11 @@ import request.LoginRequest;
 import results.*;
 //import requests.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import static java.nio.file.Files.readString;
@@ -35,29 +34,52 @@ public class ServerFacade {
     }
 
 
-    private <T> T carryRequest(String endpoint, String method, Object request, Class<T> responseClass) throws ResponseException {
+    private <T> T carryRequest(String endpoint, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             var json = new Gson();
-            URL url = new URI(this.url + endpoint).toURL();
+//            System.out.println(this.url);
+            URL url = new URI(this.url + path).toURL();
+//            System.out.println("2");    // FIXME: Delete me
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
+
             //post, get, delete, etc.
-            http.setRequestMethod(method);
+            http.setRequestMethod(endpoint);
+
+            if (!Objects.equals(endpoint, "GET")) {
+                http.setDoOutput(true);
+                write(http, request);
+            }
 
             http.connect();
 
             if (http.getResponseCode() != 200) {
-                System.out.println("http response code was not corrent\n");
+                System.out.println("http response code was not correct\n");
                 throw new ResponseException("Response code: " + http.getResponseCode() + ", message: " + http.getResponseMessage());
             }
 
             return readString(http, responseClass);
         }
         catch (Exception e) {
-            throw new ResponseException(e.getMessage());
+            throw new ResponseException("request was not carried -> " + e.getMessage());
+        }
+    }
+
+    private static void write(HttpURLConnection http, Object request) throws IOException {
+        if(request != null){
+            http.addRequestProperty("Type", "application/json");
+            var json = new Gson();
+            String data = json.toJson(request);
+            OutputStream reqBody = http.getOutputStream();
+            try (OutputStreamWriter writer = new OutputStreamWriter(reqBody, StandardCharsets.UTF_8)){
+                writer.write(data);
+                writer.flush();
+            }
+
         }
     }
 
     private static <T> T readString(HttpURLConnection http, Class<T> responseClass) throws IOException {
+        //response
         T response = null;
         var json = new Gson();
         if(http.getContentLength() > 0){
@@ -68,7 +90,7 @@ public class ServerFacade {
                 }
             }
             catch (Exception e){
-                throw new IOException(e.getMessage());
+                throw new IOException("input stream failed -> " + e.getMessage());
             }
         }
         return response;

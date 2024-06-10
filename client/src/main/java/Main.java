@@ -2,6 +2,7 @@ import com.mysql.cj.log.Log;
 import model.*;
 import request.*;
 import results.*;
+import server.Server;
 import ui.*;
 import java.util.Scanner;
 
@@ -9,7 +10,12 @@ public class Main {
     public static void main(String[] args) {
         PrintingHelp help = new PrintingHelp();
         UserData loginResult = null;
-        ServerFacade serverFacade = new ServerFacade("http://localhost:");
+
+        Server server = new Server();
+        var port = server.run(0);
+//        System.out.println("http://localhost:" + port);
+
+        ServerFacade serverFacade = new ServerFacade("http://localhost:" + port);
         boolean keepRunning = true;
         boolean loginStatus = false;
         System.out.println("Welcome to Chess. Type help to get started.");
@@ -38,7 +44,7 @@ public class Main {
                                 registerResults = serverFacade.register(registerRequest);
 
                             } catch (ResponseException e) {
-                                System.out.println(e.getMessage());
+                                System.out.println("could not get results -> " + e.getMessage());
                             }
                         }
                         else{
