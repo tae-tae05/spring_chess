@@ -5,11 +5,14 @@ import request.*;
 import results.*;
 import server.Server;
 import ui.*;
+
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws ResponseException {
         PrintingChessBoard printBoard = new PrintingChessBoard();
+        PrintListResults printingLists = new PrintListResults();
         PrintingHelp help = new PrintingHelp();
         RegisterResults loginResult = null;
         LoginRequest loginRequest;
@@ -17,8 +20,6 @@ public class Main {
         ListGameResults listGame = new ListGameResults(null, null);
         Server server = new Server();
         var port = server.run(0);
-//        System.out.println("http://localhost:" + port);
-
         ServerFacade serverFacade = new ServerFacade("http://localhost:" + port);
         boolean keepRunning = true;
         boolean loginStatus = false;
@@ -40,7 +41,6 @@ public class Main {
                     }
                     case "register" -> {
                         UserData registerRequest = new UserData(null, null, null);
-//                        RegisterResults registerResults;
                         if (inputs.length == 4) { // tokens are correct length
                             registerRequest = new UserData(inputs[1], inputs[2], inputs[3]);
                             try {
@@ -139,6 +139,7 @@ public class Main {
                         if(inputs.length == 1){
                             try {
                                 listGame = serverFacade.listGames(loginResult);
+                                printingLists.printGames(listGame);
                             }
                             catch (ResponseException e){
                                 System.out.println("unable to list games -> " + e.getMessage());
@@ -150,8 +151,25 @@ public class Main {
 
                     }
                     case "observe" -> {
-                        //display the chessboard of the called game
-                        System.out.println("authorized observe");
+                        if(inputs.length == 2) {
+                            try {
+                                boolean foundGame = false;
+                                listGame = serverFacade.listGames(loginResult);
+                                for(GameData game: listGame.games()){
+                                    if(Objects.equals(String.valueOf(game.gameID()), inputs[1])){
+                                        System.out.println("found a matching board");
+                                        printBoard.printWhiteBoard(game.game());
+                                        foundGame = true;
+                                    }
+
+                                }
+                                if(!foundGame){
+                                    System.out.println("game does not exist");
+                                }
+                            } catch (ResponseException e) {
+                                System.out.println("unable to observe game -> " + e.getMessage());
+                            }
+                        }
                     }
                     case "quit" -> {
                         try {
