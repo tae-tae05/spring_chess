@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import model.AuthData;
 import request.JoinGameRequest;
-import results.LogoutResults;
 import service.GameService;
 import spark.Request;
 import spark.Response;

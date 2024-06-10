@@ -9,8 +9,6 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import javax.sound.midi.Receiver;
-
 public class LoginHandler implements Route{
     private final DataAccess data;
     public LoginHandler(DataAccess data){

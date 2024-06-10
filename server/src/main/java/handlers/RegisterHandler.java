@@ -3,15 +3,11 @@ package handlers;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import results.RegisterResults;
 import service.RegisterService;
-import service.UserService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-
-import javax.xml.crypto.Data;
 
 public class RegisterHandler implements Route {
     private final DataAccess data;

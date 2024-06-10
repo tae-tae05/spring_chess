@@ -2,14 +2,11 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.memory.MemoryAuthDAO;
-import dataaccess.memory.MemoryUserDAO;
 import model.AuthData;
 import model.UserData;
 import results.RegisterResults;
 import spark.Response;
 
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.util.UUID;
 

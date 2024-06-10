@@ -2,7 +2,6 @@ import chess.ChessGame;
 import model.*;
 import request.*;
 import results.*;
-import server.Server;
 import ui.*;
 
 import java.util.Objects;

@@ -4,13 +4,9 @@ import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import results.ClearResults;
 import service.ClearService;
-import service.GameService;
-import service.UserService;
 import spark.Request;
 import spark.Response;
 import spark.Route;
-
-import java.net.NoRouteToHostException;
 
 public class ClearHandlers implements Route {
     private final DataAccess data;

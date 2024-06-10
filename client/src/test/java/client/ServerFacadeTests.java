@@ -3,13 +3,11 @@ package client;
 import chess.ChessGame;
 import model.GameData;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.*;
 import request.JoinGameRequest;
 import request.LoginRequest;
 import results.*;
 import server.Server;
-import service.*;
 import ui.ResponseException;
 import ui.ServerFacade;
 

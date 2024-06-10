@@ -3,7 +3,6 @@ package handlers;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import model.AuthData;
-import model.GameData;
 import results.ListGameResults;
 import service.GameService;
 import spark.Request;

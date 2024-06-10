@@ -3,7 +3,6 @@ package results;
 import model.GameData;
 
 import java.util.Collection;
-import java.util.List;
 
 public record ListGameResults(Collection<GameData> games, String message) {
     public ListGameResults setMessage(String newMessage){
