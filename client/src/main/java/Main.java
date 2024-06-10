@@ -158,7 +158,7 @@ public class Main {
                                 for(GameData game: listGame.games()){
                                     if(Objects.equals(String.valueOf(game.gameID()), inputs[1])){
                                         System.out.println("found a matching board");
-                                        printBoard.printWhiteBoard(game.game());
+                                        printBoard.printBoard(game.game());
                                         foundGame = true;
                                     }
 
