@@ -212,7 +212,6 @@ class ServiceUnitTests {
     @Order(11)
     @DisplayName("Join Game Failure")
     public void failedJoiningGame() throws DataAccessException, SQLException {
-
         AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
         GameData game = new GameData(null, "Jin", null, "my game", new ChessGame());
         CreateGameResults temp = gameService.createGame(game, auth, RESPONSE);

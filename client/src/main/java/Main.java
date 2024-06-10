@@ -17,9 +17,7 @@ public class Main {
         LoginRequest loginRequest;
         CreateGameResults createGame = new CreateGameResults();
         ListGameResults listGame = new ListGameResults(null, null);
-        Server server = new Server();
-        var port = server.run(0);
-        ServerFacade serverFacade = new ServerFacade("http://localhost:" + port);
+        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
         boolean keepRunning = true;
         boolean loginStatus = false;
         System.out.println("Welcome to Chess. Type help to get started.");

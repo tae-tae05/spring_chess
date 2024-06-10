@@ -54,6 +54,11 @@ public class ServerFacade {
         return this.carryRequest("GET", path, request, ListGameResults.class, request);
     }
 
+    public ClearResults clearAll(RegisterResults request) throws ResponseException{
+        var path = "/db";
+        return this.carryRequest("DELETE", path, request, ClearResults.class, request);
+    }
+
     private <T> T carryRequest(String endpoint, String path, Object request, Class<T> responseClass, RegisterResults login) throws ResponseException {
         try {
             var json = new Gson();
@@ -62,11 +67,10 @@ public class ServerFacade {
 
             //post, get, delete, etc.
             http.setRequestMethod(endpoint);
-            //|| (Objects.equals(path, "/session") && endpoint.equals("POST"))
+
             if(login != null){
                 http.addRequestProperty("authorization", login.authToken());
             }
-//            else if()
 
             if (!Objects.equals(endpoint, "GET")) {
                 http.setDoOutput(true);
