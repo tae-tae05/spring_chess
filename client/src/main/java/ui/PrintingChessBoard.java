@@ -40,12 +40,13 @@ public class PrintingChessBoard {
         printOutlineText(ChessGame.TeamColor.WHITE);
         String backgroundColor = "";
         System.out.print("\n");
-        int whiteRow = 1;
-        int blackRow = 8;
-        for (int r = 1; r < 9; r++) {
+        int whiteRow = 8;
+        int blackRow = 1;
+
+        for (int r = 8; r > 0; r--) {
             System.out.print(" " + whiteRow + " ");
             for (int c = 1; c < 9; c++) {
-                if ((r + c) % 2 == 0) {
+                if ((r + c) % 2 != 0) {
                     backgroundColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
                 } else {
                     backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
@@ -59,17 +60,18 @@ public class PrintingChessBoard {
                 }
             }
             System.out.print(" " + whiteRow + " ");
-            whiteRow++;
+            whiteRow--;
             System.out.print("\n");
         }
         printOutlineText(ChessGame.TeamColor.WHITE);
         System.out.println();
+
         printOutlineText(ChessGame.TeamColor.BLACK);
         System.out.print("\n");
-        for (int r = 8; r > 0; r--) {
+        for (int r = 1; r < 9; r++) {
             System.out.print(" " + blackRow + " ");
             for (int c = 8; c > 0; c--) {
-                if ((r + c) % 2 == 0) {
+                if ((r + c) % 2 != 0) {
                     backgroundColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
                 } else {
                     backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
@@ -83,7 +85,7 @@ public class PrintingChessBoard {
                 }
             }
             System.out.print(" " + blackRow + " ");
-            blackRow--;
+            blackRow++;
             System.out.print("\n");
         }
         printOutlineText(ChessGame.TeamColor.BLACK);
