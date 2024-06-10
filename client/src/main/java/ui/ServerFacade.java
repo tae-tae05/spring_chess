@@ -23,14 +23,13 @@ public class ServerFacade {
         this.url = url;
     }
 
-//    public RegisterResults register(UserData request) throws ResponseException {
-//        var path = "/user";
-//        return this.carryRequest("POST", path, request, UserData.class);;
-//    }
+    public RegisterResults register(UserData request) throws ResponseException {
+        var path = "/user";
+        return this.carryRequest("POST", path, request, UserData.class);;
+    }
 
 
-    private <T> T carryRequest(String endpoint, String method, Object request,
-                          Class<T> responseClass) throws ResponseException {
+    private <T> T carryRequest(String endpoint, String method, Object request, Class<T> responseClass) throws ResponseException {
         try {
             var json = new Gson();
 
@@ -43,10 +42,6 @@ public class ServerFacade {
             if (!(http.getResponseCode() / 100 == 2)) {
                 throw new ResponseException("Response code: " + http.getResponseCode() + ", message: " + http.getResponseMessage());
             }
-
-
-//            T passResponse = readString(http, responseClass);
-//            String response = passResponse.toString();
 
             return readString(http, responseClass);
         }
