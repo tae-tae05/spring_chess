@@ -7,7 +7,7 @@ public class CreateGameResults {
 
     public CreateGameResults(){}
 
-    public CreateGameResults(int gameID, String message){
+    public CreateGameResults(Integer gameID, String message){
         this.gameID = gameID;
         this.message = message;
     }
@@ -15,7 +15,7 @@ public class CreateGameResults {
     public void setMessage(String newMessage){
         message = newMessage;
     }
-    public void setGameID(int newGameID){
+    public void setGameID(Integer newGameID){
         gameID = newGameID;
     }
 
