@@ -15,7 +15,6 @@ import java.util.Random;
 
 public class GameService {
     private final DataAccess data;
-
     public GameService(DataAccess data){
         this.data = data;
     }
@@ -33,9 +32,6 @@ public class GameService {
             return results;
         }
         try{
-            Random rand = new Random();
-            int tempGameID = rand.nextInt((1000) + 1);
-            game = game.setGameID(tempGameID);
             data.getGameDAO().addGame(game);
             results.setGameID(game.gameID());
         }

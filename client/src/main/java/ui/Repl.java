@@ -24,6 +24,7 @@ public class Repl {
     private UserData registerRequest;
     private ServerFacade serverFacade;
 
+    private int counter = 1;
     private boolean loginStatus = false;
 
     private boolean keepRunning = true;
@@ -50,6 +51,7 @@ public class Repl {
         serverFacade = null;
         loginStatus = false;
         keepRunning = true;
+
     }
     public void run(String url) {
         serverFacade = new ServerFacade(url);
@@ -101,10 +103,8 @@ public class Repl {
                         help.printAfterLogin();
                     }
                     case "create" -> {
-                        GameData game = new GameData(null, null, null, null, new ChessGame());
                         if (inputs.length == 2) {
-                            game = game.setGameName(inputs[1]);
-                            runCreate(game, loginResult);
+                            runCreate(inputs[1], loginResult);
                         } else {
                             System.out.println("input was not correct. Enter help for specific commands");
                         }
@@ -180,13 +180,17 @@ public class Repl {
         }
     }
 
-    private void runCreate(GameData game, RegisterResults result){
+    private void runCreate(String gameName, RegisterResults result){
         try {
-            createGame = serverFacade.createGame(game, result);
+            listGame = serverFacade.listGames(loginResult);
+            counter = listGame.games().size() + 1;
+            GameData game = new GameData(counter, null, null, gameName, new ChessGame());
+            this.createGame = serverFacade.createGame(game, result);
+            System.out.println("Game has been successfully created!");
+            counter++;
         } catch (ResponseException e) {
             System.out.println("Unable to create game -> " + e.getMessage());
         }
-        System.out.println("Game has succesfully been created. The game id is " + createGame.getGameID());
     }
 
     private void runJoin(JoinGameRequest join, RegisterResults request, String gameID){

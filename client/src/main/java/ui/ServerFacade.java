@@ -80,8 +80,7 @@ public class ServerFacade {
 
 
             if (http.getResponseCode() != 200) {
-                System.out.println("http response code was not correct\n");
-                throw new ResponseException("Response code: " + http.getResponseCode() + ", message: " + http.getResponseMessage());
+                throw new ResponseException(http.getResponseCode() + " - " + http.getResponseMessage());
             }
 
             return readString(http, responseClass);
