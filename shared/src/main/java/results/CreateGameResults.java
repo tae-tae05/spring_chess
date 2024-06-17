@@ -19,7 +19,7 @@ public class CreateGameResults {
         gameID = newGameID;
     }
 
-    public int getGameID(){
+    public Integer getGameID(){
         return gameID;
     }
 

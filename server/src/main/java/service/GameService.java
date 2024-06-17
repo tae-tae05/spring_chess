@@ -4,6 +4,7 @@ import chess.ChessGame;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 
+import dataaccess.GameDAO;
 import model.AuthData;
 import model.GameData;
 import request.JoinGameRequest;
@@ -11,6 +12,7 @@ import results.*;
 import spark.Response;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Random;
 
 public class GameService {
@@ -32,8 +34,11 @@ public class GameService {
             return results;
         }
         try{
+            GameDAO gameDAO = data.getGameDAO();
+            Collection<GameData> games = gameDAO.listGames();
+            game = game.setGameID(games.size() + 1);
             data.getGameDAO().addGame(game);
-            results.setGameID(game.gameID());
+            results.setGameID(games.size() + 1);
         }
         catch(Exception e){
             results.setMessage("Error: " + e.getMessage());

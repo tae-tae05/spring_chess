@@ -199,9 +199,9 @@ class ServiceUnitTests {
     @DisplayName("Join Game Success")
     public void joinedGame() throws DataAccessException, SQLException {
         AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
-        GameData game = new GameData(null, null, null, "my game", new ChessGame());
+        GameData game = new GameData(1, null, null, "my game", new ChessGame());
         CreateGameResults temp = gameService.createGame(game, auth, RESPONSE);
-        JoinGameRequest joinRequest = new JoinGameRequest(temp.getGameID(), ChessGame.TeamColor.WHITE);
+        JoinGameRequest joinRequest = new JoinGameRequest(1, ChessGame.TeamColor.WHITE);
         LogoutResults joinResults = gameService.joinGame(joinRequest, auth, RESPONSE);
 
         Assertions.assertNull(joinResults.message(), "did not join game successfully");
@@ -213,7 +213,7 @@ class ServiceUnitTests {
     @DisplayName("Join Game Failure")
     public void failedJoiningGame() throws DataAccessException, SQLException {
         AuthData auth = data.getAuthDAO().getAuth(existingUser.getUsername());
-        GameData game = new GameData(null, "Jin", null, "my game", new ChessGame());
+        GameData game = new GameData(1, "Jin", null, "my game", new ChessGame());
         CreateGameResults temp = gameService.createGame(game, auth, RESPONSE);
         JoinGameRequest joinRequest = new JoinGameRequest(temp.getGameID(), ChessGame.TeamColor.WHITE);
         LogoutResults joinResults = gameService.joinGame(joinRequest, auth, RESPONSE);
