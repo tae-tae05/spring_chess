@@ -9,7 +9,9 @@ import results.CreateGameResults;
 import results.ListGameResults;
 import results.LogoutResults;
 import results.RegisterResults;
+import websocket.Websocket;
 
+import java.rmi.ServerException;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -23,6 +25,10 @@ public class Repl {
     private ListGameResults listGame;
     private UserData registerRequest;
     private ServerFacade serverFacade;
+
+    private String url = "http://localhost:8080";
+
+    private final Websocket webS;
 
     private int counter = 1;
     private boolean loginStatus = false;
@@ -42,16 +48,17 @@ public class Repl {
         }
     }
 
-    public Repl(){
-        loginResult = null;
-        loginRequest = null;
-        createGame = null;
-        listGame = null;
-        registerRequest = null;
-        serverFacade = null;
-        loginStatus = false;
-        keepRunning = true;
-
+    public Repl(String url) throws ServerException {
+        this.loginResult = null;
+        this.loginRequest = null;
+        this.createGame = null;
+        this.listGame = null;
+        this.registerRequest = null;
+        this.serverFacade = null;
+        this.loginStatus = false;
+        this.keepRunning = true;
+        this.url = url;
+        webS = new Websocket(url);
     }
     public void run(String url) {
         serverFacade = new ServerFacade(url);
@@ -147,6 +154,10 @@ public class Repl {
             }
         }
         System.exit(0);
+    }
+
+    public String getURL(){
+        return url;
     }
 
     private void runRegister(UserData request){

@@ -1,4 +1,5 @@
 package server;
+import org.eclipse.jetty.websocket.api.Session;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
