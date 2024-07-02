@@ -13,6 +13,9 @@ import java.util.Objects;
  */
 public class ChessGame {
     private TeamColor turn = TeamColor.WHITE;
+
+    private TeamColor winner = null;
+    private boolean gameOver = false;
     private ChessBoard board = new ChessBoard();
     public ChessGame() {
         board.resetBoard();
@@ -39,6 +42,19 @@ public class ChessGame {
     public enum TeamColor {
         WHITE,
         BLACK
+    }
+    public void setGameOver(){
+        this.gameOver = true;
+    }
+    public boolean getGameOverStatus(){
+        return gameOver;
+    }
+
+    public void setWinner(TeamColor color){
+        this.winner = color;
+    }
+    public TeamColor getWinner(){
+        return winner;
     }
 
     /**

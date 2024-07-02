@@ -74,9 +74,9 @@ public class WebsocketFacade extends Endpoint {
         }
     }
 
-    public void resign(String authToken, int gameID) throws ServerException {
+    public void resign(String authToken, int gameID, ChessGame.TeamColor color) throws ServerException {
         try{
-            var action = new ResignCommand(authToken, gameID);
+            var action = new ResignCommand(authToken, gameID, color);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         }
         catch(IOException e){

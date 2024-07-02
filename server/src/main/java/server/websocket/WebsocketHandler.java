@@ -31,10 +31,17 @@ public class WebsocketHandler {
     public void onMessage(Session session, String message) throws IOException {
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
         switch (action.getCommandType()) {
-            case CONNECT -> join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
-//            case MAKE_MOVE ->  makeMove(new MakeMoveCommand( action.getAuthString(), action.getMove(), action.getGameID()), session);
+            case CONNECT -> {
+                if(action.getPlayerColor() == null){
+                    joinAsSpectator(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
+                }
+                else {
+                    join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
+                }
+            }
+//            case MAKE_MOVE ->  makeMove(new MakeMoveCommand( action.getAuthString(), action.getGameID(), action.getMove()), session);
 //            case LEAVE -> leave(new LeaveCommand(action.getAuthString(), action.getGameID()), session);
-//            case RESIGN -> resign(new ResignCommand(action.getAuthString(), action.getGameID()), session);
+//            case RESIGN -> resign(new ResignCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session));
         }
     }
 
@@ -67,7 +74,7 @@ public class WebsocketHandler {
                 break;
             }
         }
-        //is spot is not open?
+        //if spot is not open?
         if(command.getTeamColor() == ChessGame.TeamColor.WHITE && game.whiteUsername() != null){
             manager.sendError(session, "ERROR: white spot is taken already");
             manager.sendMessage(session, "ERROR: white spot is taken already");
@@ -93,6 +100,10 @@ public class WebsocketHandler {
         NotificationM notify = new NotificationM(temp);
         String notifyJson = json.toJson(notify);
         manager.broadcast(notifyJson, game.gameID(), session);
+
+    }
+
+    public void joinAsSpectator(ConnectCommand command, Session session) throws IOException{
 
     }
 }
