@@ -7,6 +7,10 @@ import dataaccess.DatabaseManager;
 import dataaccess.memory.MemoryDataAccess;
 import dataaccess.sql.MySQLDataAccess;
 import handlers.*;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.eclipse.jetty.websocket.server.WebSocketHandler;
+import server.websocket.WebsocketHandler;
+import service.GameService;
 import spark.*;
 
 import java.sql.SQLException;
@@ -14,6 +18,9 @@ import java.sql.SQLException;
 
 public class Server {
     DataAccess data;
+
+    private final GameService gameService;
+    private WebsocketHandler ws;
     public Server(){
         try{
             data = new MySQLDataAccess();
@@ -26,12 +33,16 @@ public class Server {
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
         }
+        gameService = new GameService(data);
+        ws = new WebsocketHandler(gameService, data);
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        Spark.webSocket("/connect", WebsocketHandler.class);
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", new RegisterHandler(data));
@@ -52,7 +63,6 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
-
     public static void main(String[] args) {
         var server = new Server();
         server.run(8080);

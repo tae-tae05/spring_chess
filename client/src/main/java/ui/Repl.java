@@ -9,7 +9,7 @@ import results.CreateGameResults;
 import results.ListGameResults;
 import results.LogoutResults;
 import results.RegisterResults;
-import websocket.Websocket;
+import websocket.WebsocketFacade;
 
 import java.rmi.ServerException;
 import java.util.Objects;
@@ -28,7 +28,7 @@ public class Repl {
 
     private String url = "http://localhost:8080";
 
-    private final Websocket webS;
+    WebsocketFacade webS;
 
     private int counter = 1;
     private boolean loginStatus = false;
@@ -56,9 +56,8 @@ public class Repl {
         this.registerRequest = null;
         this.serverFacade = null;
         this.loginStatus = false;
-        this.keepRunning = true;
+//        this.keepRunning = true;
         this.url = url;
-        webS = new Websocket(url);
     }
     public void run(String url) {
         serverFacade = new ServerFacade(url);
@@ -120,8 +119,8 @@ public class Repl {
                         JoinGameRequest joinRequest = new JoinGameRequest();
                         if (inputs.length == 3) {
                             joinRequest.setGameID(Integer.valueOf(inputs[1]));
-                            joinRequest = setTeamColor(inputs[2],joinRequest);
-                            runJoin(joinRequest, loginResult, inputs[1]);
+                            JoinGameRequest newJoinRequest = setTeamColor(inputs[2],joinRequest);
+                            runJoin(newJoinRequest, loginResult, inputs[1]);
                         } else {
                             System.out.println("input was not correct. Enter help for specific commands");
                         }
@@ -211,11 +210,16 @@ public class Repl {
             listGame = serverFacade.listGames(loginResult);
             for (GameData currentGame : listGame.games()) {
                 if (Objects.equals(String.valueOf(currentGame.gameID()), gameID)) {
+                    webS = new WebsocketFacade(url);
+                    webS.connect(request.authToken(), join.getTeamColor(), join.getGameID());
+                    System.out.println("successfully joined websocket");
                     printBoard.printBoard(currentGame.game());
                 }
             }
         } catch (ResponseException e) {
             System.out.println("failed to join game -> " + e.getMessage());
+        } catch (ServerException e) {
+            throw new RuntimeException(e);
         }
     }
 

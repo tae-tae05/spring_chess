@@ -1,5 +1,8 @@
 package websocket.commands;
 
+import chess.ChessGame;
+import chess.ChessMove;
+
 import java.util.Objects;
 
 /**
@@ -24,6 +27,17 @@ public class UserGameCommand {
     protected CommandType commandType;
 
     private final String authToken;
+    int gameID;
+
+    public int getGameID() { return gameID;}
+    ChessGame.TeamColor playerColor;
+
+    public ChessGame.TeamColor getPlayerColor() {
+        return playerColor;
+    }
+
+    protected ChessMove move;
+    public ChessMove getMove(){return move;}
 
     public String getAuthString() {
         return authToken;
@@ -32,6 +46,8 @@ public class UserGameCommand {
     public CommandType getCommandType() {
         return this.commandType;
     }
+
+
 
     @Override
     public boolean equals(Object o) {
