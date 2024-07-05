@@ -14,16 +14,23 @@ import java.rmi.ServerException;
 import javax.websocket.Session;
 
 
-public class WebsocketFacade extends Endpoint {
+public class WebsocketClient extends Endpoint {
     Session session;
     private NotifHandler notifHandler;
 
-    public WebsocketFacade(String url) throws ServerException{
+    public WebsocketClient(String url, NotifHandler notif) throws ServerException{
         try {
+            this.notifHandler = notif;
             url = url.replace("http", "ws");
             URI uri = new URI(url + "/connect");
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, uri);
+//            this.session = ContainerProvider.getWebSocketContainer().connectToServer(new Endpoint() {
+//                @Override
+//                public void onOpen(Session session, EndpointConfig endpointConfig) {
+//                }
+//            }, uri);
+//            this.session.addMessageHandler(this);
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
@@ -41,8 +48,11 @@ public class WebsocketFacade extends Endpoint {
             throw new ServerException(e.getMessage());
         }
     }
-    @Override
-    public void onOpen(Session session, EndpointConfig endpointConfig) {
+
+    public void onOpen(Session session, EndpointConfig endpointConfig){
+    }
+    public void send(String msg) throws Exception {
+        this.session.getBasicRemote().sendText(msg);
     }
 
     public void connect(String authToken, ChessGame.TeamColor teamColor, int gameID) throws ServerException {
@@ -64,6 +74,7 @@ public class WebsocketFacade extends Endpoint {
             throw new ServerException(e.getMessage());
         }
     }
+
     public void makeMove(String authToken, int gameID, ChessMove move) throws ServerException {
         try{
             var action = new MakeMoveCommand(authToken, gameID, move);
@@ -83,4 +94,5 @@ public class WebsocketFacade extends Endpoint {
             throw new ServerException(e.getMessage());
         }
     }
+
 }

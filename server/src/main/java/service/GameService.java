@@ -69,7 +69,7 @@ public class GameService {
             return results;
         }
         try{
-            String username = data.getAuthDAO().getUsername(auth);
+            String username = data.getAuthDAO().getUsername(auth.authToken());
             data.getGameDAO().insertUsername(join.getGameID(), username, join.getTeamColor());
             response.status(200);
         }

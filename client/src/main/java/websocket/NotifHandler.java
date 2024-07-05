@@ -1,9 +1,12 @@
 package websocket;
 
-import websocket.messages.LoadGameM;
-import websocket.messages.ServerMessage;
+import websocket.messages.*;
 
 public interface NotifHandler {
-    public void updateGame(LoadGameM message);
+//    public default void notify(String message) {
+//    }
+    ;
     public void printMessage(ServerMessage message);
+
+    public void updateGame(LoadGameM message);
 }

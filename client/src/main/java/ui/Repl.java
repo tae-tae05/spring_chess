@@ -9,13 +9,15 @@ import results.CreateGameResults;
 import results.ListGameResults;
 import results.LogoutResults;
 import results.RegisterResults;
-import websocket.WebsocketFacade;
+import websocket.NotifHandler;
+import websocket.WebsocketClient;
+import websocket.messages.*;
 
 import java.rmi.ServerException;
 import java.util.Objects;
 import java.util.Scanner;
 
-public class Repl {
+public class Repl implements NotifHandler {
     private PrintingChessBoard printBoard = new PrintingChessBoard();
     private PrintListResults printingLists = new PrintListResults();
     private PrintingHelp help = new PrintingHelp();
@@ -28,7 +30,7 @@ public class Repl {
 
     private String url = "http://localhost:8080";
 
-    WebsocketFacade webS;
+    private final WebsocketClient webS;
 
     private int counter = 1;
     private boolean loginStatus = false;
@@ -58,6 +60,7 @@ public class Repl {
         this.loginStatus = false;
 //        this.keepRunning = true;
         this.url = url;
+        webS = new WebsocketClient(url, this);
     }
     public void run(String url) {
         serverFacade = new ServerFacade(url);
@@ -210,7 +213,6 @@ public class Repl {
             listGame = serverFacade.listGames(loginResult);
             for (GameData currentGame : listGame.games()) {
                 if (Objects.equals(String.valueOf(currentGame.gameID()), gameID)) {
-                    webS = new WebsocketFacade(url);
                     webS.connect(request.authToken(), join.getTeamColor(), join.getGameID());
                     System.out.println("successfully joined websocket");
                     printBoard.printBoard(currentGame.game());
@@ -258,5 +260,27 @@ public class Repl {
             System.out.println("failed to quit -> " + e.getMessage());
         }
         setStatus(false, false);
+    }
+
+    @Override
+    public void updateGame(LoadGameM message){
+        //update game here
+        System.out.println(message.getMessage());
+        ChessGame game = message.getGame();
+        //redraw board here?
+    }
+
+
+    @Override
+    public void printMessage(ServerMessage message) {
+        if(message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
+            ErrorM error = (ErrorM) message;
+            System.out.println(error.getErrorMessage());
+        }
+        if(message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION){
+            NotificationM notif = (NotificationM) message;
+            System.out.println(notif.getMessage());
+        }
+
     }
 }

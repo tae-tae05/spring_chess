@@ -90,8 +90,8 @@ public class MySQLAuthDAO implements AuthDAO {
     }
 
     @Override
-    public String getUsername(AuthData auth) {
-        String sql = "SELECT username FROM auth WHERE authToken= '" + auth.authToken() + "'";
+    public String getUsername(String auth) {
+        String sql = "SELECT username FROM auth WHERE authToken= '" + auth + "'";
         try (var connection = DatabaseManager.getConnection()){
             var pst = connection.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();

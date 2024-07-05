@@ -17,5 +17,5 @@ public interface AuthDAO {
 
     AuthData getAuth(String username);
 
-    String getUsername(AuthData auth);
+    String getUsername(String auth);
 }

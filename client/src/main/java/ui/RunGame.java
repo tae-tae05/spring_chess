@@ -2,7 +2,7 @@ package ui;
 
 import chess.*;
 import model.*;
-import websocket.WebsocketFacade;
+import websocket.WebsocketClient;
 
 import java.rmi.ServerException;
 import java.util.Map;
@@ -13,7 +13,7 @@ public class RunGame {
     String url;
     ChessGame game;
     int gameID;
-    WebsocketFacade webS;
+    WebsocketClient webS;
     AuthData auth;
     Scanner scanner = new Scanner(System.in);
     ChessGame.TeamColor myColor;
@@ -30,7 +30,7 @@ public class RunGame {
             'h', 8
     );
 
-    public RunGame(ServerFacade server, String url, AuthData auth, int gameID, ChessGame.TeamColor color, WebsocketFacade webS){
+    public RunGame(ServerFacade server, String url, AuthData auth, int gameID, ChessGame.TeamColor color, WebsocketClient webS){
         this.server = server;
         this.url = url;
         this.auth = auth;
@@ -106,7 +106,7 @@ public class RunGame {
         }
     }
 
-    public void move(){
+    public void move() throws ServerException {
         if(observer){
             return;
         }
@@ -123,6 +123,57 @@ public class RunGame {
         int row = getRow();
         int col = getCol();
 
+        ChessPosition startPosition = new ChessPosition(row, col);
+        ChessPiece piece = board.getPiece(startPosition);
+
+        while(game.validMoves(startPosition).isEmpty() || piece == null){
+            System.out.println("You can't move that piece. Try again, what piece would you like to move?");
+            row = getRow();
+            col = getCol();
+            startPosition = new ChessPosition(row, col);
+            piece = board.getPiece(startPosition);
+        }
+
+        System.out.println("Where would you like to move it to?");
+        int newRow = getRow();
+        int newCol = getCol();
+        ChessPosition end = new ChessPosition(newRow, newCol);
+        //TODO - validMoves returns ChessMoves, change to ChessPositions with highlight
+        while(!game.validMoves(startPosition).contains(end)){
+            System.out.println("That's not a valid move. Where would you like to move that piece to?");
+            newRow = getRow();
+            newCol = getCol();
+            end = new ChessPosition(row, col);
+        }
+        ChessPiece.PieceType promote = null;
+        if(piece.getPieceType() == ChessPiece.PieceType.PAWN && (row == 8 || row == 1)){
+//            promote = getPromotion();
+        }
+        ChessMove move = new ChessMove(startPosition, end, promote);
+        webS.makeMove(auth.authToken(), gameID, move);
+    }
+
+    public ChessPiece.PieceType getPromotion(){
+        System.out.println("What would you like to promote your pawn to?\nq -> queen\nr -> rook\nk -> knight\nb -> bishop");
+        String piece = scanner.nextLine();
+        switch (piece) {
+            case "q" -> {
+                return ChessPiece.PieceType.QUEEN;
+            }
+            case "r" -> {
+                return ChessPiece.PieceType.ROOK;
+            }
+            case "k" -> {
+                return ChessPiece.PieceType.KNIGHT;
+            }
+            case "b" -> {
+                return ChessPiece.PieceType.BISHOP;
+            }
+            default -> {
+                System.out.println("Not valid. Try again!");
+                return getPromotion();
+            }
+        }
     }
 
 

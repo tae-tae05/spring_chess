@@ -39,20 +39,49 @@ public class WebsocketHandler {
                     join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
                 }
             }
-//            case MAKE_MOVE ->  makeMove(new MakeMoveCommand( action.getAuthString(), action.getGameID(), action.getMove()), session);
-//            case LEAVE -> leave(new LeaveCommand(action.getAuthString(), action.getGameID()), session);
-//            case RESIGN -> resign(new ResignCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session));
+            case MAKE_MOVE ->  makeMove(new MakeMoveCommand(action.getAuthString(), action.getGameID(), action.getMove()), session);
+            case LEAVE -> leave(new LeaveCommand(action.getAuthString(), action.getGameID()), session);
+            case RESIGN -> resign(new ResignCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
         }
     }
 
-    public void join(ConnectCommand command, Session session) throws IOException {
-        AuthData auth = new AuthData(null, null);
-        try{
-            AuthDAO authDAO = data.getAuthDAO();
-            String username = authDAO.getUsername(new AuthData(null, command.getAuthString()));
-            auth = authDAO.getAuth(username);
+    public void makeMove(MakeMoveCommand makeMove, Session session) throws IOException{
+
+    }
+
+    public void leave(LeaveCommand leave, Session session) throws IOException{
+        GameData game = null;
+        for (GameData currentGame : data.getGameDAO().listGames()) {
+            if(currentGame.gameID() ==  leave.getGameID()) {
+                game = currentGame;
+            }
         }
-        catch(Exception e){
+        String username = data.getAuthDAO().getUsername(leave.getAuthString());
+        try {
+            if (game.whiteUsername().equals(username)) {
+                //TODO - update game
+                return;
+            }
+            if (game.blackUsername().equals(username)) {
+                //TODO - update game
+                return;
+            }
+            String message = username + " has left the game";
+            manager.broadcast(message, game.gameID(), session);
+            manager.removeSession(game.gameID(), session);
+        }
+        catch (Exception e){
+            System.out.println("leave request could not be granted - " + e.getMessage());
+        }
+    }
+
+    public void resign(ResignCommand resign, Session session) throws IOException{
+
+    }
+
+    public void join(ConnectCommand command, Session session) throws IOException {
+        AuthData auth = checkCredentials(command.getAuthString());
+        if(auth == null){
             manager.sendError(session, "ERROR: not authorized");
             manager.sendMessage(session, "ERROR: not authorized");
             return;
@@ -85,7 +114,6 @@ public class WebsocketHandler {
             manager.sendMessage(session, "ERROR: black spot is taken already");
             return;
         }
-        //add observer here later
         manager.addSession(command.getGameID(), session);
         ServerMessage loadGame = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
         String loadGameJson = json.toJson(loadGame);
@@ -104,6 +132,45 @@ public class WebsocketHandler {
     }
 
     public void joinAsSpectator(ConnectCommand command, Session session) throws IOException{
+        AuthData auth = checkCredentials(command.getAuthString());
+        if(auth == null){
+            manager.sendError(session, "ERROR: not authorized");
+            manager.sendMessage(session, "ERROR: not authorized");
+            return;
+        }
+        try{
+            manager.addSession(command.getGameID(), session);
+            GameDAO gameDAO = data.getGameDAO();
+            AuthDAO authDAO = data.getAuthDAO();
+            GameData gameData= null;
+            Collection<GameData> games = gameDAO.listGames();
+            for(GameData tempGame: games){
+                if(tempGame.gameID() == command.getGameID()){
+                    gameData = tempGame;
+                    break;
+                }
+            }
+            if(gameData != null) {
+                String message = "Enjoy watching " + gameData.gameName() + "!";
+                manager.sendMessage(session, message);
+                NotificationM notify = new NotificationM("An observer has joined");
+                String notifyJson = json.toJson(notify);
+                manager.broadcast(notifyJson, gameData.gameID(), session);
+            }
+            else{
+                manager.sendError(session, "ERROR: Could not join as a spectator");
+                manager.sendMessage(session, "ERROR: Could not join as a spectator");
+            }
+        } catch (Exception e) {
+            System.out.println("could not join as a spectator - " + e.getMessage());
+        }
+    }
 
+    public AuthData checkCredentials(String auth){
+        AuthData authData = null;
+        AuthDAO authDAO = data.getAuthDAO();
+        String userName = authDAO.getUsername(auth);
+        authData = authDAO.getAuth(userName);
+        return authData;
     }
 }
