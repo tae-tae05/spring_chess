@@ -3,8 +3,6 @@ package websocket.commands;
 import chess.ChessGame;
 
 public class ConnectCommand extends UserGameCommand{
-    private final int gameID;
-    private String authToken;
     private ChessGame.TeamColor teamColor;
 
     public ConnectCommand(String authToken, Integer gameID, ChessGame.TeamColor color){

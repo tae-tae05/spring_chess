@@ -5,13 +5,12 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import model.*;
 import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import websocket.commands.*;
-import websocket.messages.ErrorM;
-import websocket.messages.NotificationM;
-import websocket.messages.ServerMessage;
+import websocket.messages.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -30,22 +29,42 @@ public class WebsocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
-        switch (action.getCommandType()) {
-            case CONNECT -> {
-                if(action.getPlayerColor() == null){
-                    joinAsSpectator(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
-                }
-                else {
-                    join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
-                }
-            }
-            case MAKE_MOVE ->  makeMove(new MakeMoveCommand(action.getAuthString(), action.getGameID(), action.getMove()), session);
-            case LEAVE -> leave(new LeaveCommand(action.getAuthString(), action.getGameID()), session);
-            case RESIGN -> resign(new ResignCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
-        }
+//        switch (action.getCommandType()) {
+//            case CONNECT -> {
+//                if(action.getPlayerColor() == null){
+//                    joinAsSpectator(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
+//                }
+//                else {
+//                    join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
+//                }
+//            }
+//            case MAKE_MOVE ->  makeMove(new MakeMoveCommand(action.getAuthString(), action.getGameID(), action.getMove()), session);
+//            case LEAVE -> leave(new LeaveCommand(action.getAuthString(), action.getGameID()), session);
+//            case RESIGN -> resign(new ResignCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
+//        }
     }
 
+    @OnWebSocketError
+    public void onError(Throwable throwable) {
+        System.out.println(throwable.getMessage());
+    }
     public void makeMove(MakeMoveCommand makeMove, Session session) throws IOException{
+        AuthData auth = checkCredentials(makeMove.getAuthString());
+        if(auth == null){
+            manager.sendError(session, "ERROR: not authorized");
+            manager.sendMessage(session, "ERROR: not authorized");
+            return;
+        }
+        GameData game = null;
+        for (GameData currentGame : data.getGameDAO().listGames()) {
+            if(currentGame.gameID() ==  makeMove.getGameID()) {
+                game = currentGame;
+            }
+        }
+        if(game.game().getGameOverStatus()){
+            manager.sendMessage(session, "ERROR: game over. There are no moves left to make");
+            return;
+        }
 
     }
 

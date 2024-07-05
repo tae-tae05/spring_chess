@@ -6,12 +6,10 @@ import websocket.commands.*;
 import websocket.messages.*;
 
 import javax.websocket.*;
-import javax.websocket.MessageHandler;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.ServerException;
-import javax.websocket.Session;
 
 
 public class WebsocketClient extends Endpoint {
@@ -22,7 +20,7 @@ public class WebsocketClient extends Endpoint {
         try {
             this.notifHandler = notif;
             url = url.replace("http", "ws");
-            URI uri = new URI(url + "/connect");
+            URI uri = new URI(url + "/ws");
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, uri);
 //            this.session = ContainerProvider.getWebSocketContainer().connectToServer(new Endpoint() {

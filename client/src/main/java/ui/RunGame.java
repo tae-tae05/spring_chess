@@ -5,6 +5,8 @@ import model.*;
 import websocket.WebsocketClient;
 
 import java.rmi.ServerException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -75,7 +77,8 @@ public class RunGame {
         }
     }
     public void runGame() throws ServerException {
-        while(true){
+        boolean run = true;
+        while(run){
             System.out.println("Type help for all options");
             String input = scanner.nextLine();
             var inputs = input.split(" ");
@@ -83,6 +86,7 @@ public class RunGame {
                 case "quit" ->{
                     try{
                         webS.leave(auth.authToken(), gameID);
+                        run = false;
                     } catch (ServerException e) {
                         System.out.println("failed to quit game, connection issues?");
                     }
@@ -138,8 +142,9 @@ public class RunGame {
         int newRow = getRow();
         int newCol = getCol();
         ChessPosition end = new ChessPosition(newRow, newCol);
-        //TODO - validMoves returns ChessMoves, change to ChessPositions with highlight
-        while(!game.validMoves(startPosition).contains(end)){
+
+        Collection<ChessPosition> validMoves = endMoves(game.validMoves(startPosition));
+        while(!validMoves.contains(end)){
             System.out.println("That's not a valid move. Where would you like to move that piece to?");
             newRow = getRow();
             newCol = getCol();
@@ -147,10 +152,24 @@ public class RunGame {
         }
         ChessPiece.PieceType promote = null;
         if(piece.getPieceType() == ChessPiece.PieceType.PAWN && (row == 8 || row == 1)){
-//            promote = getPromotion();
+            promote = getPromotion();
         }
         ChessMove move = new ChessMove(startPosition, end, promote);
+        if(piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+            game.setTeamTurn(ChessGame.TeamColor.BLACK);
+        }
+        else{
+            game.setTeamTurn(ChessGame.TeamColor.WHITE);
+        }
         webS.makeMove(auth.authToken(), gameID, move);
+    }
+
+    public Collection<ChessPosition> endMoves(Collection<ChessMove> moves){
+        Collection<ChessPosition> possibilities = new ArrayList<>();
+        for(ChessMove move: moves){
+            possibilities.add(move.getEndPosition());
+        }
+        return possibilities;
     }
 
     public ChessPiece.PieceType getPromotion(){
@@ -208,5 +227,8 @@ public class RunGame {
                 move - make your move
                 help - see all commands""";
         System.out.println(help);
+    }
+
+    public void printBoard(){
     }
 }

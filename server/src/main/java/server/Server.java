@@ -41,7 +41,7 @@ public class Server {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
 
-        Spark.webSocket("/ws", WebsocketHandler.class);
+        Spark.webSocket("/ws", ws);
         Spark.get("/echo/:msg", (req, res) -> "HTTP response: " + req.params(":msg"));
 
         // Register your endpoints and handle exceptions here.

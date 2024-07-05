@@ -5,7 +5,6 @@ import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.TestFactory;
 import passoff.model.*;
 import passoff.server.TestServerFacade;
 import passoff.websocket.TestCommand;
@@ -37,20 +36,20 @@ public class WebSocketTests {
         server.stop();
     }
 
-//    @BeforeAll
-//    public static void init() throws URISyntaxException {
-//        server = new Server();
-//        var port = Integer.toString(server.run(0));
-//        System.out.println("Started test HTTP server on " + port);
-//
-//        serverFacade = new TestServerFacade("localhost", port);
-//        serverFacade.clear();
-//
-//        GsonBuilder gsonBuilder = org.junit.jupiter.api.TestFactory.getGsonBuilder();
-//        environment = new WebsocketTestingEnvironment("localhost", port, "/ws", gsonBuilder);
-//
-//        waitTime = TestFactory.getMessageTime();
-//    }
+    @BeforeAll
+    public static void init() throws URISyntaxException {
+        server = new Server();
+        var port = Integer.toString(server.run(0));
+        System.out.println("Started test HTTP server on " + port);
+
+        serverFacade = new TestServerFacade("localhost", port);
+        serverFacade.clear();
+
+        GsonBuilder gsonBuilder = TestFactory.getGsonBuilder();
+        environment = new WebsocketTestingEnvironment("localhost", port, "/ws", gsonBuilder);
+
+        waitTime = TestFactory.getMessageTime();
+    }
 
     @BeforeEach
     public void setup() {

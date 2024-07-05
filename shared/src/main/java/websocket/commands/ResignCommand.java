@@ -4,7 +4,6 @@ import chess.ChessGame;
 import model.AuthData;
 
 public class ResignCommand extends UserGameCommand{
-    private final Integer gameID;
     private final ChessGame.TeamColor myColor;
 
     public ResignCommand(String auth, Integer gameID, ChessGame.TeamColor color){
