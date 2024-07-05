@@ -14,4 +14,8 @@ public record GameData(Integer gameID, String whiteUsername, String blackUsernam
     public GameData setGameName(String newGameName){
         return new GameData(gameID, whiteUsername, blackUsername, newGameName, game);
     }
+
+    public GameData setGame(ChessGame game){
+        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+    }
 }

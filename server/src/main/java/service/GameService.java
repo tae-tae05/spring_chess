@@ -37,6 +37,7 @@ public class GameService {
             GameDAO gameDAO = data.getGameDAO();
             Collection<GameData> games = gameDAO.listGames();
             game = game.setGameID(games.size() + 1);
+            game = game.setGame(new ChessGame());
             data.getGameDAO().addGame(game);
             results.setGameID(games.size() + 1);
         }

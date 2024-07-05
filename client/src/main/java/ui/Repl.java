@@ -27,6 +27,7 @@ public class Repl implements NotifHandler {
     private ListGameResults listGame;
     private UserData registerRequest;
     private ServerFacade serverFacade;
+    private RunGame runGame;
 
     private String url = "http://localhost:8080";
 
@@ -61,6 +62,7 @@ public class Repl implements NotifHandler {
 //        this.keepRunning = true;
         this.url = url;
         webS = new WebsocketClient(url, this);
+        this.runGame = new RunGame(serverFacade, url, null, 0, null, webS, null);
     }
     public void run(String url) {
         serverFacade = new ServerFacade(url);
@@ -214,8 +216,13 @@ public class Repl implements NotifHandler {
             for (GameData currentGame : listGame.games()) {
                 if (Objects.equals(String.valueOf(currentGame.gameID()), gameID)) {
                     webS.connect(request.authToken(), join.getTeamColor(), join.getGameID());
-                    System.out.println("successfully joined websocket");
-                    printBoard.printBoard(currentGame.game());
+//                    System.out.println("successfully joined websocket");
+                    runGame.setAuth(request.authToken());
+                    runGame.setGameID(join.getGameID());
+                    runGame.setColor(join.getTeamColor());
+                    runGame.setGame(currentGame.game());
+//                    printBoard.printBoard(currentGame.game());
+                    runGame.runGame();
                 }
             }
         } catch (ResponseException e) {

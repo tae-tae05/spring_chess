@@ -16,10 +16,11 @@ public class RunGame {
     ChessGame game;
     int gameID;
     WebsocketClient webS;
-    AuthData auth;
+    String auth;
     Scanner scanner = new Scanner(System.in);
     ChessGame.TeamColor myColor;
     boolean observer = false;
+    PrintingChessBoard boardPrinter = new PrintingChessBoard();
 
     private final Map<Character, Integer> numbers = Map.of(
             'a', 1,
@@ -32,7 +33,7 @@ public class RunGame {
             'h', 8
     );
 
-    public RunGame(ServerFacade server, String url, AuthData auth, int gameID, ChessGame.TeamColor color, WebsocketClient webS){
+    public RunGame(ServerFacade server, String url, String auth, int gameID, ChessGame.TeamColor color, WebsocketClient webS, ChessGame game){
         this.server = server;
         this.url = url;
         this.auth = auth;
@@ -42,6 +43,7 @@ public class RunGame {
         if(myColor == null){
             observer = true;
         }
+        this.game = game;
     }
 
     private int getRow(){
@@ -85,7 +87,7 @@ public class RunGame {
             switch(inputs[0]) {
                 case "quit" ->{
                     try{
-                        webS.leave(auth.authToken(), gameID);
+                        webS.leave(auth, gameID);
                         run = false;
                     } catch (ServerException e) {
                         System.out.println("failed to quit game, connection issues?");
@@ -102,6 +104,9 @@ public class RunGame {
                 }
                 case "resign" -> {
                     resign();
+                }
+                case "redraw" -> {
+                    redraw();
                 }
                 default -> {
                     System.out.println(inputs[0] + " is not a valid command, please type 'help' for a list of commands");
@@ -161,7 +166,7 @@ public class RunGame {
         else{
             game.setTeamTurn(ChessGame.TeamColor.WHITE);
         }
-        webS.makeMove(auth.authToken(), gameID, move);
+        webS.makeMove(auth, gameID, move);
     }
 
     public Collection<ChessPosition> endMoves(Collection<ChessMove> moves){
@@ -209,15 +214,35 @@ public class RunGame {
             game.setWinner(ChessGame.TeamColor.WHITE);
         }
         game.setGameOver();
-        webS.resign(auth.authToken(), gameID, myColor);
+        webS.resign(auth, gameID, myColor);
     }
 
     public void leave(){
         try{
-            webS.leave(auth.authToken(), gameID);
+            webS.leave(auth, gameID);
         } catch (ServerException e) {
             System.out.println("failed to leave game");
         }
+    }
+    public void redraw(){
+        printBoard();
+    }
+
+    public void printBoard(){
+        if(myColor == ChessGame.TeamColor.BLACK){
+            printBlack();
+        }
+        else{
+            printWhite();
+        }
+    }
+
+    public void printWhite(){
+        boardPrinter.printWhite(game);
+    }
+
+    public void printBlack(){
+        boardPrinter.printBlack(game);
     }
 
     public void printHelp(){
@@ -225,10 +250,22 @@ public class RunGame {
                 redraw - see the board
                 leave - exit the game
                 move - make your move
-                help - see all commands""";
+                help - see all commands
+                quit - exit""";
         System.out.println(help);
     }
 
-    public void printBoard(){
+    public void setAuth(String auth){
+        this.auth = auth;
+    }
+    public void setColor(ChessGame.TeamColor color){
+        this.myColor = color;
+    }
+    public void setGameID(int gameID){
+        this.gameID = gameID;
+    }
+
+    public void setGame(ChessGame game){
+        this.game = game;
     }
 }

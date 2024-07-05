@@ -29,19 +29,19 @@ public class WebsocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
-//        switch (action.getCommandType()) {
-//            case CONNECT -> {
-//                if(action.getPlayerColor() == null){
-//                    joinAsSpectator(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
-//                }
-//                else {
-//                    join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
-//                }
-//            }
-//            case MAKE_MOVE ->  makeMove(new MakeMoveCommand(action.getAuthString(), action.getGameID(), action.getMove()), session);
-//            case LEAVE -> leave(new LeaveCommand(action.getAuthString(), action.getGameID()), session);
-//            case RESIGN -> resign(new ResignCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
-//        }
+        switch (action.getCommandType()) {
+            case CONNECT -> {
+                if(action.getPlayerColor() == null){
+                    joinAsSpectator(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
+                }
+                else {
+                    join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
+                }
+            }
+            case MAKE_MOVE ->  makeMove(new MakeMoveCommand(action.getAuthString(), action.getGameID(), action.getMove()), session);
+            case LEAVE -> leave(new LeaveCommand(action.getAuthString(), action.getGameID()), session);
+            case RESIGN -> resign(new ResignCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
+        }
     }
 
     @OnWebSocketError

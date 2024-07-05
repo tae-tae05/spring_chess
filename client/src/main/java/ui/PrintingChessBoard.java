@@ -29,12 +29,47 @@ public class PrintingChessBoard {
 
     public void printBoard(ChessGame game){
         ChessBoard board = game.getBoard();
+        printWhite(game);
+        printBlack(game);
+//        ChessGame.TeamColor turnColor = ChessGame.TeamColor.WHITE;
+//        printOutlineText(ChessGame.TeamColor.WHITE);
+//        String backgroundColor = "";
+//        System.out.print("\n");
+//        int whiteRow = 8;
+//        int blackRow = 1;
+//
+//        for (int r = 8; r > 0; r--) {
+//            System.out.print(" " + whiteRow + " ");
+//            for (int c = 1; c < 9; c++) {
+//                printHelper(r, c, game, turnColor);
+//            }
+//            System.out.print(" " + whiteRow + " ");
+//            whiteRow--;
+//            System.out.print("\n");
+//        }
+//        printOutlineText(ChessGame.TeamColor.WHITE);
+//        System.out.println();
+//
+//        printOutlineText(ChessGame.TeamColor.BLACK);
+//        System.out.print("\n");
+//        for (int r = 1; r < 9; r++) {
+//            System.out.print(" " + blackRow + " ");
+//            for (int c = 8; c > 0; c--) {
+//                printHelper(r, c, game, turnColor);
+//            }
+//            System.out.print(" " + blackRow + " ");
+//            blackRow++;
+//            System.out.print("\n");
+//        }
+//        printOutlineText(ChessGame.TeamColor.BLACK);
+//        System.out.println();
+    }
+
+    public void printWhite(ChessGame game){
         ChessGame.TeamColor turnColor = ChessGame.TeamColor.WHITE;
         printOutlineText(ChessGame.TeamColor.WHITE);
-        String backgroundColor = "";
         System.out.print("\n");
         int whiteRow = 8;
-        int blackRow = 1;
 
         for (int r = 8; r > 0; r--) {
             System.out.print(" " + whiteRow + " ");
@@ -47,7 +82,13 @@ public class PrintingChessBoard {
         }
         printOutlineText(ChessGame.TeamColor.WHITE);
         System.out.println();
+    }
 
+    public void printBlack(ChessGame game){
+        ChessGame.TeamColor turnColor = ChessGame.TeamColor.WHITE;
+        String backgroundColor = "";
+        System.out.print("\n");
+        int blackRow = 1;
         printOutlineText(ChessGame.TeamColor.BLACK);
         System.out.print("\n");
         for (int r = 1; r < 9; r++) {
