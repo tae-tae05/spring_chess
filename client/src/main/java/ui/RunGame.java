@@ -133,13 +133,31 @@ public class RunGame {
                     redraw(game);
                 }
                 case "highlight" -> {
-                    //TODO - create highlight function
+                    highlight();
                 }
                 default -> {
                     System.out.println(inputs[0] + " is not a valid command, please type 'help' for a list of commands");
                 }
             }
         }
+    }
+
+    public void highlight(){
+        System.out.println("What piece would you like to check?");
+        int row;
+        int col;
+        while(true) {
+            row = getRow();
+            col = getCol();
+            if (game.getBoard().getPiece(new ChessPosition(row, col)) == null) {
+                System.out.println("That's an empty spot. Try again.");
+            }
+            else{
+                break;
+            }
+        }
+        Collection<ChessPosition> finalMoves = endMoves(game.validMoves(new ChessPosition(row, col)));
+        boardPrinter.printHighlight(game, new ChessPosition(row, col), finalMoves);
     }
 
     public void setAsObserver(){
