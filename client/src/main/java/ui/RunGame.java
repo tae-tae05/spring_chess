@@ -22,6 +22,7 @@ public class RunGame {
     ChessGame.TeamColor myColor;
     boolean observer = false;
     PrintingChessBoard boardPrinter = new PrintingChessBoard();
+    private boolean run = true;
 
     private final NotifHandler notif;
 
@@ -110,14 +111,13 @@ public class RunGame {
         return startPosition;
     }
     public void runGame() throws ServerException, InvalidMoveException {
-        boolean run = true;
+        run = true;
         while(run){
             System.out.println("Type help for more commands");
             String input = scanner.nextLine();
             var inputs = input.split(" ");
             switch(inputs[0]) {
                 case "leave" ->{
-                    run = false;
                     leave();
                 }
                 case "help" -> {
@@ -267,10 +267,12 @@ public class RunGame {
         if(s.equals("y")) {
             try {
                 webS.leave(auth, gameID);
+                run = false;
             } catch (ServerException e) {
                 System.out.println("failed to leave game");
             }
         }
+
     }
     public void redraw(ChessGame newGame){
         this.game = newGame;

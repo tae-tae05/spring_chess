@@ -28,7 +28,7 @@ public class WebsocketHandler {
         this.data = data;
     }
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException {
+    public void onMessage(Session session, String message) throws IOException, DataAccessException {
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
         switch (action.getCommandType()) {
             case CONNECT -> join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
@@ -49,11 +49,6 @@ public class WebsocketHandler {
             return;
         }
         GameData game = getGame(makeMove.getGameID());
-//        for (GameData currentGame : data.getGameDAO().listGames()) {
-//            if(currentGame.gameID() ==  makeMove.getGameID()) {
-//                game = currentGame;
-//            }
-//        }
         try {
             //get the team color
             ChessGame.TeamColor myColor = null;
@@ -136,11 +131,6 @@ public class WebsocketHandler {
 
     public void leave(LeaveCommand leave, Session session) throws IOException{
         GameData game = getGame(leave.getGameID());
-//        for (GameData currentGame : data.getGameDAO().listGames()) {
-//            if(currentGame.gameID() ==  leave.getGameID()) {
-//                game = currentGame;
-//            }
-//        }
         String username = data.getAuthDAO().getUsername(leave.getAuthString());
         try {
             if(game != null) {
@@ -155,13 +145,14 @@ public class WebsocketHandler {
                     }
                 }
                 String message = username + " has left the game";
-                String notifyJson = json.toJson(message);
+                NotificationM notify = new NotificationM(message);
+                String notifyJson = json.toJson(notify);
                 manager.broadcast(notifyJson, game.gameID(), session);
                 manager.removeSession(game.gameID(), session);
             }
         }
-        catch (Exception e){
-            System.out.println("leave request could not be granted - " + e.getMessage());
+        catch (IOException e){
+            manager.sendError(session, "ERROR: could not leave the game");
         }
     }
 
@@ -178,26 +169,35 @@ public class WebsocketHandler {
         try {
             GameData game = getGame(resign.getGameID());
             AuthData auth = checkCredentials(resign.getAuthString());
-            ChessGame chessGame = game.game();
             if (auth == null) {
                 manager.sendError(session, "ERROR: not authorized");
                 return;
             }
+            ChessGame chessGame = game.game();
+            String m = auth.username() + " has resigned. ";
+
             if (game.game().getGameOverStatus()) {
                 manager.sendError(session, "ERROR: game is already over");
                 return;
             }
             if (game.whiteUsername() != null && game.whiteUsername().equals(auth.username())) {
                 chessGame.setGameOver();
-                chessGame.setWinner(ChessGame.TeamColor.WHITE);
+                chessGame.setWinner(ChessGame.TeamColor.BLACK);
+                m += ChessGame.TeamColor.BLACK;
             } else if (game.blackUsername() != null && game.blackUsername().equals(auth.username())) {
                 chessGame.setGameOver();
-                chessGame.setWinner(ChessGame.TeamColor.BLACK);
+                chessGame.setWinner(ChessGame.TeamColor.WHITE);
+                m += ChessGame.TeamColor.WHITE;
             } else {
                 manager.sendError(session, "ERROR: You can't resign if you're not a player.");
                 return;
             }
             data.getGameDAO().updateGame(chessGame, game.gameID());
+            m += " is the winner!";
+            NotificationM notify = new NotificationM(m);
+            String notifyJson = json.toJson(notify);
+            manager.broadcast(notifyJson, game.gameID(), session);
+            manager.sendMessage(session, notifyJson);
         }
         catch(DataAccessException e){
             manager.sendError(session, "ERROR: Unable to resign");
