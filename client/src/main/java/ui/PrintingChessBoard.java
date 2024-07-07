@@ -29,6 +29,7 @@ public class PrintingChessBoard {
     }
 
     public void printHighlight(ChessGame game, ChessPosition startPosition, Collection<ChessPosition> highlightMoves){
+        System.out.println("highlight spot");
         ChessGame.TeamColor turn = game.getBoard().getPiece(startPosition).getTeamColor();
         printOutlineText(turn);
         System.out.print("\n");
@@ -38,11 +39,7 @@ public class PrintingChessBoard {
                 System.out.print(" " + white + " ");
                 for (int c = 1; c < 9; c++) {
                     ChessPosition start = new ChessPosition(r, c);
-                    if (highlightMoves.contains(start)) {
-                        printHighlightHelper(r, c, game, turn, true);
-                    } else {
-                        printHighlightHelper(r, c, game, turn, false);
-                    }
+                    printHelper(r, c, game, turn, highlightMoves.contains(start), startPosition);
                 }
                 System.out.print(" " + white + " ");
                 white--;
@@ -55,11 +52,7 @@ public class PrintingChessBoard {
                 System.out.print(" " + black + " ");
                 for (int c = 8; c > 0; c--) {
                     ChessPosition start = new ChessPosition(r, c);
-                    if (highlightMoves.contains(start)) {
-                        printHighlightHelper(r, c, game, turn, true);
-                    } else {
-                        printHighlightHelper(r, c, game, turn, false);
-                    }
+                    printHelper(r, c, game, turn, highlightMoves.contains(start), startPosition);
                 }
                 System.out.print(" " + black + " ");
                 black++;
@@ -85,7 +78,7 @@ public class PrintingChessBoard {
         for (int r = 8; r > 0; r--) {
             System.out.print(" " + whiteRow + " ");
             for (int c = 1; c < 9; c++) {
-                printHelper(r, c, game, turnColor);
+                printHelper(r, c, game, turnColor, false, null);
             }
             System.out.print(" " + whiteRow + " ");
             whiteRow--;
@@ -97,7 +90,6 @@ public class PrintingChessBoard {
 
     public void printBlack(ChessGame game){
         ChessGame.TeamColor turnColor = ChessGame.TeamColor.WHITE;
-        String backgroundColor = "";
         System.out.print("\n");
         int blackRow = 1;
         printOutlineText(ChessGame.TeamColor.BLACK);
@@ -105,7 +97,7 @@ public class PrintingChessBoard {
         for (int r = 1; r < 9; r++) {
             System.out.print(" " + blackRow + " ");
             for (int c = 8; c > 0; c--) {
-                printHelper(r, c, game, turnColor);
+                printHelper(r, c, game, turnColor, false, null);
             }
             System.out.print(" " + blackRow + " ");
             blackRow++;
@@ -115,31 +107,41 @@ public class PrintingChessBoard {
         System.out.println();
     }
 
-    public void printHelper(int row, int col, ChessGame game, ChessGame.TeamColor turnColor){
-        String backgroundColor;
-        if ((row + col) % 2 != 0) {
-            backgroundColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
-        } else {
-            backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
-        }
-        ChessPiece piece = game.getBoard().getPiece(new ChessPosition(row, col));
-        if (piece == null) {
-            System.out.print(backgroundColor + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
-        }
-        else{
-            printPiece(piece, turnColor, backgroundColor);
-        }
-    }
+//    public void printHelper(int row, int col, ChessGame game, ChessGame.TeamColor turnColor){
+//        String backgroundColor;
+//        if ((row + col) % 2 != 0) {
+//            backgroundColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+//        } else {
+//            backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+//        }
+//        ChessPiece piece = game.getBoard().getPiece(new ChessPosition(row, col));
+//        if (piece == null) {
+//            System.out.print(backgroundColor + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
+//        }
+//        else{
+//            printPiece(piece, turnColor, backgroundColor);
+//        }
+//    }
 
-    public void printHighlightHelper(int row, int col, ChessGame game, ChessGame.TeamColor turnColor, boolean highlight){
-        String backgroundColor;
-        if ((row + col) % 2 != 0) {
-            backgroundColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
-        } else {
-            backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+    public void printHelper(int row, int col, ChessGame game, ChessGame.TeamColor turnColor, boolean highlight, ChessPosition startPosition){
+        String backgroundColor = "";
+        if(startPosition != null && startPosition.getRow() == row && startPosition.getColumn() == col){
+            backgroundColor = EscapeSequences.SET_BG_COLOR_YELLOW;
         }
-        if(highlight){
-            backgroundColor += EscapeSequences.SET_BG_COLOR_BLUE;
+        else if ((row + col) % 2 != 0) {
+            if(highlight) {
+                backgroundColor = EscapeSequences.SET_BG_COLOR_GREEN;
+            }
+            else{
+                backgroundColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+            }
+        } else {
+            if(highlight) {
+                backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+            }
+            else{
+                backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+            }
         }
         ChessPiece piece = game.getBoard().getPiece(new ChessPosition(row, col));
         if (piece == null) {
