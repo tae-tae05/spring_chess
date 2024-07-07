@@ -165,7 +165,6 @@ public class RunGame {
     }
 
     public void move() throws ServerException, InvalidMoveException {
-        System.out.println("Turn = " + game.getTeamTurn());
         if(observer){
             System.out.println("You're an observer. You can't make moves, so just sit and watch.");
             return;

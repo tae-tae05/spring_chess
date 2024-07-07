@@ -298,11 +298,11 @@ public class Repl implements NotifHandler {
     public void printMessage(ServerMessage message) {
         if(message.getServerMessageType() == ServerMessage.ServerMessageType.ERROR){
             ErrorM error = (ErrorM) message;
-            System.out.println(error.getErrorMessage());
+            System.out.println(EscapeSequences.SET_TEXT_ITALIC + EscapeSequences.SET_TEXT_COLOR_RED + error.getErrorMessage() + EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_TEXT_BOLD_FAINT);
         }
         if(message.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION){
             NotificationM notif = (NotificationM) message;
-            System.out.println(notif.getMessage());
+            System.out.println(EscapeSequences.SET_TEXT_BOLD + EscapeSequences.SET_TEXT_COLOR_BLUE + notif.getMessage() + EscapeSequences.RESET_TEXT_COLOR + EscapeSequences.RESET_TEXT_BOLD_FAINT);
         }
 
     }
