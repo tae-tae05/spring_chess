@@ -1,6 +1,6 @@
 package server.websocket;
 
-import chess.ChessGame;
+import chess.*;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.*;
@@ -31,12 +31,13 @@ public class WebsocketHandler {
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
         switch (action.getCommandType()) {
             case CONNECT -> {
-                if(action.getPlayerColor() == null){
-                    joinAsSpectator(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
-                }
-                else {
-                    join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
-                }
+                join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
+//                if(action.getPlayerColor() == null){
+//                    joinAsSpectator(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
+//                }
+//                else {
+//                    join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
+//                }
             }
             case MAKE_MOVE ->  makeMove(new MakeMoveCommand(action.getAuthString(), action.getGameID(), action.getMove()), session);
             case LEAVE -> leave(new LeaveCommand(action.getAuthString(), action.getGameID()), session);
@@ -61,11 +62,85 @@ public class WebsocketHandler {
                 game = currentGame;
             }
         }
-        if(game.game().getGameOverStatus()){
-            manager.sendMessage(session, "ERROR: game over. There are no moves left to make");
-            return;
+        try {
+            //get the team color
+            ChessGame.TeamColor myColor = null;
+            ChessGame.TeamColor opponentColor = null;
+            if(auth.username().equals(game.blackUsername())){
+                myColor = ChessGame.TeamColor.BLACK;
+                opponentColor = ChessGame.TeamColor.WHITE;
+            }
+            else if(auth.username().equals(game.whiteUsername())){
+                myColor = ChessGame.TeamColor.WHITE;
+                opponentColor = ChessGame.TeamColor.BLACK;
+            }
+            else{
+                manager.sendMessage(session, "ERROR: You are not authorized to make a move");
+                manager.sendError(session, "ERROR: You are not authorized to make a move");
+            }
+            //check game status and other illegal stuffs
+            if (game.game().getGameOverStatus()) {
+                manager.sendMessage(session, "ERROR: game over. There are no moves left to make");
+                manager.sendError(session, "ERROR: game over. There are no moves left to make");
+                return;
+            }
+            if(game.game().getBoard().getPiece(makeMove.getMove().getStartPosition()).getTeamColor() != myColor){
+                manager.sendMessage(session, "ERROR: stop trying to move pieces that aren't yours");
+                manager.sendError(session, "ERROR: stop trying to move pieces that aren't yours");
+                return;
+            }
+            //make move
+            ChessGame newGame = game.game();
+            ChessBoard board = newGame.getBoard();
+            ChessPiece piece = board.getPiece(makeMove.getMove().getStartPosition());
+            newGame.makeMove(makeMove.getMove());
+            String message = auth.username() + " has made the move " + makeMove.getMove().getStartPosition() + " to " +  makeMove.getMove().getEndPosition();
+            NotificationM notify = new NotificationM(message);
+            String notifyJson = json.toJson(notify);
+            manager.broadcast(notifyJson, game.gameID(), session);
+            LoadGameM load = new LoadGameM(game.game(), "");
+            notifyJson = json.toJson(load);
+            manager.sendMessage(session, notifyJson);
+            manager.broadcast(notifyJson, game.gameID(), session);
+            //check if making move has ended the game
+            if(newGame.isInStalemate(myColor)){
+                gameStatusUpdate("You are now in stalemate. The game is over!", game.gameID(), session, opponentColor, myColor);
+//                notify = new NotificationM("You are now in stalemate. The game is over!");
+//                notifyJson = json.toJson(notify);
+//                manager.sendMessage(session, notifyJson);
+//                manager.broadcast(notifyJson, game.gameID(), session);
+            }
+            if(newGame.isInCheckmate(opponentColor)){
+                String m = opponentColor + " is in checkmate. " +  myColor + " has won the game!";
+                gameStatusUpdate(m, game.gameID(), session, opponentColor, myColor);
+//                notify = new NotificationM(m);
+//                notifyJson = json.toJson(notify);
+//                manager.sendMessage(session, notifyJson);
+//                manager.broadcast(notifyJson, game.gameID(), session);
+                newGame.setGameOver();
+            }
+            else if(newGame.isInCheckmate(opponentColor)){
+                String m = opponentColor + " is in check.";
+                gameStatusUpdate(m, game.gameID(), session, opponentColor, myColor);
+//                notify = new NotificationM(m);
+//                notifyJson = json.toJson(notify);
+//                manager.sendMessage(session, notifyJson);
+//                manager.broadcast(notifyJson, game.gameID(), session);
+            }
+            newGame.setTeamTurn(opponentColor);
+            game = game.setGame(newGame);
+            data.getGameDAO().updateGame(game.game(), game.gameID());
+        } catch (IOException | DataAccessException | InvalidMoveException e) {
+            throw new RuntimeException(e);
         }
 
+    }
+
+    public void gameStatusUpdate(String m, int gameID, Session session, ChessGame.TeamColor opponentColor, ChessGame.TeamColor myColor) throws IOException {
+        NotificationM notify = new NotificationM(m);
+        String notifyJson = json.toJson(notify);
+        manager.sendMessage(session, notifyJson);
+        manager.broadcast(notifyJson, gameID, session);
     }
 
     public void leave(LeaveCommand leave, Session session) throws IOException{
@@ -77,20 +152,34 @@ public class WebsocketHandler {
         }
         String username = data.getAuthDAO().getUsername(leave.getAuthString());
         try {
-            if (game.whiteUsername().equals(username)) {
-                //TODO - update game
-                return;
+            if(game != null) {
+                if(game.whiteUsername() != null) {
+                    if (game.whiteUsername().equals(username)) {
+                        updateGame(ChessGame.TeamColor.WHITE, leave.getGameID());
+                    }
+                }
+                if (game.blackUsername() != null) {
+                    if(game.blackUsername().equals(username)) {
+                        updateGame(ChessGame.TeamColor.BLACK, leave.getGameID());
+                    }
+                }
+                String message = username + " has left the game";
+                String notifyJson = json.toJson(message);
+                manager.broadcast(notifyJson, game.gameID(), session);
+                manager.removeSession(game.gameID(), session);
             }
-            if (game.blackUsername().equals(username)) {
-                //TODO - update game
-                return;
-            }
-            String message = username + " has left the game";
-            manager.broadcast(message, game.gameID(), session);
-            manager.removeSession(game.gameID(), session);
         }
         catch (Exception e){
             System.out.println("leave request could not be granted - " + e.getMessage());
+        }
+    }
+
+    public void updateGame(ChessGame.TeamColor color, int gameID){
+        if(color.equals(ChessGame.TeamColor.WHITE)){
+            data.getGameDAO().makeUsernameNull(ChessGame.TeamColor.WHITE, gameID);
+        }
+        else{
+            data.getGameDAO().makeUsernameNull(ChessGame.TeamColor.BLACK, gameID);
         }
     }
 
@@ -123,66 +212,35 @@ public class WebsocketHandler {
             }
         }
         //if spot is not open?
-        if(command.getTeamColor() == ChessGame.TeamColor.WHITE && game.whiteUsername() != null){
-            manager.sendError(session, "ERROR: white spot is taken already");
-            manager.sendMessage(session, "ERROR: white spot is taken already");
-            return;
-        }
-        else if(command.getTeamColor() == ChessGame.TeamColor.BLACK && game.blackUsername() != null){
-            manager.sendError(session, "ERROR: black spot is taken already");
-            manager.sendMessage(session, "ERROR: black spot is taken already");
-            return;
-        }
+//        if(command.getPlayerColor() == null){
+//        }
+//        else if(command.getPlayerColor() == ChessGame.TeamColor.WHITE && game.whiteUsername() != null){
+//            manager.sendError(session, "ERROR: white spot is taken already");
+//            manager.sendMessage(session, "ERROR: white spot is taken already");
+//            return;
+//        }
+//        else if(command.getPlayerColor() == ChessGame.TeamColor.BLACK && game.blackUsername() != null){
+//            manager.sendError(session, "ERROR: black spot is taken already");
+//            manager.sendMessage(session, "ERROR: black spot is taken already");
+//            return;
+//        }
         manager.addSession(command.getGameID(), session);
-        ServerMessage loadGame = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-        String loadGameJson = json.toJson(loadGame);
+        LoadGameM loaded = new LoadGameM(game.game(),"Welcome to " + game.gameName() + "!");
+        String loadGameJson = json.toJson(loaded);
         manager.sendMessage(session, loadGameJson);
-        String temp = auth.username() + " has joined as ";
-        if(command.getTeamColor().equals(ChessGame.TeamColor.WHITE)){
-            temp += " white.";
+        String temp = auth.username();
+        if(command.getPlayerColor() == null){
+            temp += " has joined as an observer.";
         }
-        else{
-            temp += "black.";
+        else if(command.getPlayerColor().equals(ChessGame.TeamColor.WHITE)){
+            temp += " has joined as white.";
+        }
+        else if (command.getPlayerColor().equals(ChessGame.TeamColor.BLACK)){
+            temp += " has joined as black.";
         }
         NotificationM notify = new NotificationM(temp);
         String notifyJson = json.toJson(notify);
         manager.broadcast(notifyJson, game.gameID(), session);
-
-    }
-
-    public void joinAsSpectator(ConnectCommand command, Session session) throws IOException{
-        AuthData auth = checkCredentials(command.getAuthString());
-        if(auth == null){
-            manager.sendError(session, "ERROR: not authorized");
-            manager.sendMessage(session, "ERROR: not authorized");
-            return;
-        }
-        try{
-            manager.addSession(command.getGameID(), session);
-            GameDAO gameDAO = data.getGameDAO();
-            AuthDAO authDAO = data.getAuthDAO();
-            GameData gameData= null;
-            Collection<GameData> games = gameDAO.listGames();
-            for(GameData tempGame: games){
-                if(tempGame.gameID() == command.getGameID()){
-                    gameData = tempGame;
-                    break;
-                }
-            }
-            if(gameData != null) {
-                String message = "Enjoy watching " + gameData.gameName() + "!";
-                manager.sendMessage(session, message);
-                NotificationM notify = new NotificationM("An observer has joined");
-                String notifyJson = json.toJson(notify);
-                manager.broadcast(notifyJson, gameData.gameID(), session);
-            }
-            else{
-                manager.sendError(session, "ERROR: Could not join as a spectator");
-                manager.sendMessage(session, "ERROR: Could not join as a spectator");
-            }
-        } catch (Exception e) {
-            System.out.println("could not join as a spectator - " + e.getMessage());
-        }
     }
 
     public AuthData checkCredentials(String auth){
@@ -192,4 +250,5 @@ public class WebsocketHandler {
         authData = authDAO.getAuth(userName);
         return authData;
     }
+
 }

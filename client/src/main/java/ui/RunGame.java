@@ -2,6 +2,7 @@ package ui;
 
 import chess.*;
 import model.*;
+import websocket.NotifHandler;
 import websocket.WebsocketClient;
 
 import java.rmi.ServerException;
@@ -22,6 +23,8 @@ public class RunGame {
     boolean observer = false;
     PrintingChessBoard boardPrinter = new PrintingChessBoard();
 
+    private final NotifHandler notif;
+
     private final Map<Character, Integer> numbers = Map.of(
             'a', 1,
             'b', 2,
@@ -33,22 +36,25 @@ public class RunGame {
             'h', 8
     );
 
-    public RunGame(ServerFacade server, String url, String auth, int gameID, ChessGame.TeamColor color, WebsocketClient webS, ChessGame game){
+    public RunGame(ServerFacade server, String url, String auth, int gameID, ChessGame.TeamColor color, NotifHandler notif, WebsocketClient webS){
         this.server = server;
         this.url = url;
         this.auth = auth;
         this.gameID = gameID;
         this.myColor = color;
         this.webS = webS;
-        if(myColor == null){
-            observer = true;
-        }
-        this.game = game;
+        this.notif = notif;
     }
 
     private int getRow(){
         System.out.print("Row = ");
         String r = scanner.nextLine();
+        for(int i = 0; i < r.length(); i++){
+            if(!Character.isDigit(r.charAt(i))){
+                System.out.println("Enter a correct number");
+                return getRow();
+            }
+        }
         int row = Integer.parseInt(r);
         if(row > 0 && row < 9){
             return row;
@@ -78,20 +84,41 @@ public class RunGame {
             return getCol();
         }
     }
-    public void runGame() throws ServerException {
+
+    private ChessPosition getStartPosition(){
+        ChessBoard board = game.getBoard();
+        System.out.println("What piece would you like to move?");
+        int row = getRow();
+        int col = getCol();
+        ChessPosition startPosition = new ChessPosition(row, col);
+        ChessPiece piece = board.getPiece(startPosition);
+        while(piece == null || piece.getTeamColor() != myColor || game.validMoves(startPosition).isEmpty()) {
+            if(piece == null){
+                System.out.println("There's nothing there. Try again.");
+            }
+            else if(game.validMoves(startPosition).isEmpty()){
+                System.out.println("There's no where to move it. Try again.");
+            }
+            else{
+                System.out.println("That's not your piece. Try again");
+            }
+            row = getRow();
+            col = getCol();
+            startPosition = new ChessPosition(row, col);
+            piece = board.getPiece(startPosition);
+        }
+        return startPosition;
+    }
+    public void runGame() throws ServerException, InvalidMoveException {
         boolean run = true;
         while(run){
-            System.out.println("Type help for all options");
+            System.out.println("Type help for more commands");
             String input = scanner.nextLine();
             var inputs = input.split(" ");
             switch(inputs[0]) {
-                case "quit" ->{
-                    try{
-                        webS.leave(auth, gameID);
-                        run = false;
-                    } catch (ServerException e) {
-                        System.out.println("failed to quit game, connection issues?");
-                    }
+                case "leave" ->{
+                    run = false;
+                    leave();
                 }
                 case "help" -> {
                     printHelp();
@@ -99,14 +126,14 @@ public class RunGame {
                 case "move" -> {
                     move();
                 }
-                case "leave" -> {
-                    leave();
-                }
                 case "resign" -> {
                     resign();
                 }
                 case "redraw" -> {
-                    redraw();
+                    redraw(game);
+                }
+                case "highlight" -> {
+                    //TODO - create highlight function
                 }
                 default -> {
                     System.out.println(inputs[0] + " is not a valid command, please type 'help' for a list of commands");
@@ -115,8 +142,14 @@ public class RunGame {
         }
     }
 
-    public void move() throws ServerException {
+    public void setAsObserver(){
+        observer = true;
+    }
+
+    public void move() throws ServerException, InvalidMoveException {
+        System.out.println("Turn = " + game.getTeamTurn());
         if(observer){
+            System.out.println("You're an observer. You can't make moves, so just sit and watch.");
             return;
         }
         if(game.getGameOverStatus()){
@@ -127,21 +160,33 @@ public class RunGame {
             System.out.println("It's not your turn");
             return;
         }
+        printBoard();
         ChessBoard board = game.getBoard();
-        System.out.println("What piece would you like to move?");
-        int row = getRow();
-        int col = getCol();
 
-        ChessPosition startPosition = new ChessPosition(row, col);
-        ChessPiece piece = board.getPiece(startPosition);
+        ChessPosition startPosition = getStartPosition();
+        ChessPiece piece = game.getBoard().getPiece(startPosition);
 
-        while(game.validMoves(startPosition).isEmpty() || piece == null){
-            System.out.println("You can't move that piece. Try again, what piece would you like to move?");
-            row = getRow();
-            col = getCol();
-            startPosition = new ChessPosition(row, col);
-            piece = board.getPiece(startPosition);
-        }
+//        System.out.println("What piece would you like to move?");
+//        int row = getRow();
+//        int col = getCol();
+//        ChessPosition startPosition = new ChessPosition(row, col);
+//        ChessPiece piece = board.getPiece(startPosition);
+//
+//        while(piece.getTeamColor() != myColor){
+//            System.out.println("That's not your piece. Try again.");
+//            row = getRow();
+//            col = getCol();
+//            startPosition = new ChessPosition(row, col);
+//            piece = board.getPiece(startPosition);
+//        }
+//
+//        while(game.validMoves(startPosition).isEmpty() || piece == null){
+//            System.out.println("You can't move that piece. Try again, what piece would you like to move?");
+//            row = getRow();
+//            col = getCol();
+//            startPosition = new ChessPosition(row, col);
+//            piece = board.getPiece(startPosition);
+//        }
 
         System.out.println("Where would you like to move it to?");
         int newRow = getRow();
@@ -153,20 +198,15 @@ public class RunGame {
             System.out.println("That's not a valid move. Where would you like to move that piece to?");
             newRow = getRow();
             newCol = getCol();
-            end = new ChessPosition(row, col);
+            end = new ChessPosition(newRow, newCol);
         }
         ChessPiece.PieceType promote = null;
-        if(piece.getPieceType() == ChessPiece.PieceType.PAWN && (row == 8 || row == 1)){
+        if(piece.getPieceType() == ChessPiece.PieceType.PAWN && (newRow == 8 || newRow == 1)){
             promote = getPromotion();
         }
         ChessMove move = new ChessMove(startPosition, end, promote);
-        if(piece.getTeamColor() == ChessGame.TeamColor.WHITE){
-            game.setTeamTurn(ChessGame.TeamColor.BLACK);
-        }
-        else{
-            game.setTeamTurn(ChessGame.TeamColor.WHITE);
-        }
         webS.makeMove(auth, gameID, move);
+
     }
 
     public Collection<ChessPosition> endMoves(Collection<ChessMove> moves){
@@ -202,6 +242,10 @@ public class RunGame {
 
 
     public void resign() throws ServerException {
+        if(observer){
+            System.out.println("You're an observer. You can't resign.");
+            return;
+        }
         System.out.println("Are you sure you want to resign? Type y for yes, n for no");
         String answer = scanner.nextLine();
         if(!answer.equals("y")){
@@ -218,13 +262,18 @@ public class RunGame {
     }
 
     public void leave(){
-        try{
-            webS.leave(auth, gameID);
-        } catch (ServerException e) {
-            System.out.println("failed to leave game");
+        System.out.println("Are you sure you want to leave? Type y for yes, n for no");
+        String s = scanner.nextLine();
+        if(s.equals("y")) {
+            try {
+                webS.leave(auth, gameID);
+            } catch (ServerException e) {
+                System.out.println("failed to leave game");
+            }
         }
     }
-    public void redraw(){
+    public void redraw(ChessGame newGame){
+        this.game = newGame;
         printBoard();
     }
 
@@ -251,15 +300,17 @@ public class RunGame {
                 leave - exit the game
                 move - make your move
                 help - see all commands
-                quit - exit""";
+                highlight - see legal moves for a specific piece""";
         System.out.println(help);
     }
+
 
     public void setAuth(String auth){
         this.auth = auth;
     }
     public void setColor(ChessGame.TeamColor color){
         this.myColor = color;
+        observer = false;
     }
     public void setGameID(int gameID){
         this.gameID = gameID;

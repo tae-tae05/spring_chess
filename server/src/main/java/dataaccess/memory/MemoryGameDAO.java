@@ -20,6 +20,19 @@ public class MemoryGameDAO implements GameDAO {
         GAMES.add(game);
     }
 
+    @Override
+    public void makeUsernameNull(ChessGame.TeamColor color, int gameID) {
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    @Override
+    public void updateGame(ChessGame newGame, int gameID) throws DataAccessException {
+    }
+
 
     @Override
     public boolean verifyBlackPosition(int gameID) {

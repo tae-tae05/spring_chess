@@ -1,6 +1,7 @@
 package ui;
 
 import chess.ChessGame;
+import chess.InvalidMoveException;
 import model.GameData;
 import model.UserData;
 import request.JoinGameRequest;
@@ -62,7 +63,7 @@ public class Repl implements NotifHandler {
 //        this.keepRunning = true;
         this.url = url;
         webS = new WebsocketClient(url, this);
-        this.runGame = new RunGame(serverFacade, url, null, 0, null, webS, null);
+        this.runGame = new RunGame(serverFacade, url, null, 0, null,this, webS);
     }
     public void run(String url) {
         serverFacade = new ServerFacade(url);
@@ -216,18 +217,16 @@ public class Repl implements NotifHandler {
             for (GameData currentGame : listGame.games()) {
                 if (Objects.equals(String.valueOf(currentGame.gameID()), gameID)) {
                     webS.connect(request.authToken(), join.getTeamColor(), join.getGameID());
-//                    System.out.println("successfully joined websocket");
                     runGame.setAuth(request.authToken());
                     runGame.setGameID(join.getGameID());
                     runGame.setColor(join.getTeamColor());
-                    runGame.setGame(currentGame.game());
-//                    printBoard.printBoard(currentGame.game());
+
                     runGame.runGame();
                 }
             }
         } catch (ResponseException e) {
             System.out.println("failed to join game -> " + e.getMessage());
-        } catch (ServerException e) {
+        } catch (ServerException | InvalidMoveException e) {
             throw new RuntimeException(e);
         }
     }
@@ -244,18 +243,28 @@ public class Repl implements NotifHandler {
     private void observing(RegisterResults request, String gameID){
         try {
             boolean foundGame = false;
+            GameData game = null;
             listGame = serverFacade.listGames(loginResult);
-            for (GameData game : listGame.games()) {
-                if (Objects.equals(String.valueOf(game.gameID()), gameID)) {
-                    printBoard.printBoard(game.game());
+            for (GameData tempGame : listGame.games()) {
+                if (Objects.equals(String.valueOf(tempGame.gameID()), gameID)) {
+                    game = tempGame;
                     foundGame = true;
                 }
             }
             if (!foundGame) {
                 System.out.println("game does not exist");
+                return;
             }
+            webS.connect(request.authToken(), null, game.gameID());
+            runGame.setAuth(request.authToken());
+            runGame.setGameID(game.gameID());
+            runGame.setAsObserver();
+            runGame.setGame(game.game());
+            runGame.runGame();
         } catch (ResponseException e) {
             System.out.println("unable to observe game -> " + e.getMessage());
+        } catch (ServerException | InvalidMoveException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -272,9 +281,16 @@ public class Repl implements NotifHandler {
     @Override
     public void updateGame(LoadGameM message){
         //update game here
-        System.out.println(message.getMessage());
         ChessGame game = message.getGame();
         //redraw board here?
+        PrintingChessBoard print = new PrintingChessBoard();
+//        if(game.getTeamTurn() == ChessGame.TeamColor.WHITE) {
+//            print.printWhite(game);
+//        }
+//        else{
+//            print.printBlack(game);
+//        }
+        runGame.redraw(message.getGame());
     }
 
 

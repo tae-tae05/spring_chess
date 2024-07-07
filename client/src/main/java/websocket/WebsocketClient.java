@@ -23,12 +23,6 @@ public class WebsocketClient extends Endpoint {
             URI uri = new URI(url + "/ws");
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, uri);
-//            this.session = ContainerProvider.getWebSocketContainer().connectToServer(new Endpoint() {
-//                @Override
-//                public void onOpen(Session session, EndpointConfig endpointConfig) {
-//                }
-//            }, uri);
-//            this.session.addMessageHandler(this);
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {

@@ -5,19 +5,48 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
 import dataaccess.GameDAO;
-import model.AuthData;
 import model.GameData;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class MySQLGameDAO implements GameDAO {
 
     static int i = 1;
     public MySQLGameDAO() throws DataAccessException, SQLException {
+    }
+    @Override
+    public void updateGame(ChessGame newGame, int gameID) throws DataAccessException {
+        var gson = new Gson();
+        String game = gson.toJson(newGame);
+        String update = "UPDATE game SET game = ? WHERE gameID = " + gameID;
+        try(var connection = DatabaseManager.getConnection()){
+            var pst = connection.prepareStatement(update);
+            pst.setString(1, game);
+            int result = pst.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to update game " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void makeUsernameNull(ChessGame.TeamColor color, int gameID){
+        String update = "";
+        if(color == ChessGame.TeamColor.WHITE) {
+            update = "UPDATE game set whiteUsername = ? WHERE gameID = " + gameID;
+        }
+        else{
+            update = "UPDATE game set blackUsername = ? WHERE gameID = " + gameID;
+        }
+        try(var connection = DatabaseManager.getConnection()){
+            var pst = connection.prepareStatement(update);
+            pst.setString(1, null);
+            int result = pst.executeUpdate();
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException("Unable to change username " + e.getMessage());
+        }
     }
 
     @Override

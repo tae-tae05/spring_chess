@@ -13,9 +13,6 @@ public class ResignCommand extends UserGameCommand{
         this.myColor = color;
     }
 
-    public int getGameID(){
-        return gameID;
-    }
     public ChessGame.TeamColor getPlayerColor(){
         return myColor;
     }
