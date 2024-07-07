@@ -13,6 +13,7 @@ import websocket.commands.*;
 import websocket.messages.*;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 @WebSocket
@@ -30,15 +31,7 @@ public class WebsocketHandler {
     public void onMessage(Session session, String message) throws IOException {
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
         switch (action.getCommandType()) {
-            case CONNECT -> {
-                join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
-//                if(action.getPlayerColor() == null){
-//                    joinAsSpectator(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
-//                }
-//                else {
-//                    join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
-//                }
-            }
+            case CONNECT -> join(new ConnectCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
             case MAKE_MOVE ->  makeMove(new MakeMoveCommand(action.getAuthString(), action.getGameID(), action.getMove()), session);
             case LEAVE -> leave(new LeaveCommand(action.getAuthString(), action.getGameID()), session);
             case RESIGN -> resign(new ResignCommand(action.getAuthString(), action.getGameID(), action.getPlayerColor()), session);
@@ -53,15 +46,14 @@ public class WebsocketHandler {
         AuthData auth = checkCredentials(makeMove.getAuthString());
         if(auth == null){
             manager.sendError(session, "ERROR: not authorized");
-            manager.sendMessage(session, "ERROR: not authorized");
             return;
         }
-        GameData game = null;
-        for (GameData currentGame : data.getGameDAO().listGames()) {
-            if(currentGame.gameID() ==  makeMove.getGameID()) {
-                game = currentGame;
-            }
-        }
+        GameData game = getGame(makeMove.getGameID());
+//        for (GameData currentGame : data.getGameDAO().listGames()) {
+//            if(currentGame.gameID() ==  makeMove.getGameID()) {
+//                game = currentGame;
+//            }
+//        }
         try {
             //get the team color
             ChessGame.TeamColor myColor = null;
@@ -75,17 +67,15 @@ public class WebsocketHandler {
                 opponentColor = ChessGame.TeamColor.BLACK;
             }
             else{
-                manager.sendMessage(session, "ERROR: You are not authorized to make a move");
                 manager.sendError(session, "ERROR: You are not authorized to make a move");
+                return;
             }
             //check game status and other illegal stuffs
             if (game.game().getGameOverStatus()) {
-                manager.sendMessage(session, "ERROR: game over. There are no moves left to make");
                 manager.sendError(session, "ERROR: game over. There are no moves left to make");
                 return;
             }
             if(game.game().getBoard().getPiece(makeMove.getMove().getStartPosition()).getTeamColor() != myColor){
-                manager.sendMessage(session, "ERROR: stop trying to move pieces that aren't yours");
                 manager.sendError(session, "ERROR: stop trying to move pieces that aren't yours");
                 return;
             }
@@ -98,7 +88,7 @@ public class WebsocketHandler {
             NotificationM notify = new NotificationM(message);
             String notifyJson = json.toJson(notify);
             manager.broadcast(notifyJson, game.gameID(), session);
-            LoadGameM load = new LoadGameM(game.game(), "");
+            LoadGameM load = new LoadGameM(game.game(), null);
             notifyJson = json.toJson(load);
             manager.sendMessage(session, notifyJson);
             manager.broadcast(notifyJson, game.gameID(), session);
@@ -131,6 +121,7 @@ public class WebsocketHandler {
             game = game.setGame(newGame);
             data.getGameDAO().updateGame(game.game(), game.gameID());
         } catch (IOException | DataAccessException | InvalidMoveException e) {
+            manager.sendError(session, "Error: invalid move");
             throw new RuntimeException(e);
         }
 
@@ -144,12 +135,12 @@ public class WebsocketHandler {
     }
 
     public void leave(LeaveCommand leave, Session session) throws IOException{
-        GameData game = null;
-        for (GameData currentGame : data.getGameDAO().listGames()) {
-            if(currentGame.gameID() ==  leave.getGameID()) {
-                game = currentGame;
-            }
-        }
+        GameData game = getGame(leave.getGameID());
+//        for (GameData currentGame : data.getGameDAO().listGames()) {
+//            if(currentGame.gameID() ==  leave.getGameID()) {
+//                game = currentGame;
+//            }
+//        }
         String username = data.getAuthDAO().getUsername(leave.getAuthString());
         try {
             if(game != null) {
@@ -183,64 +174,82 @@ public class WebsocketHandler {
         }
     }
 
-    public void resign(ResignCommand resign, Session session) throws IOException{
-
+    public void resign(ResignCommand resign, Session session) throws IOException, DataAccessException {
+        try {
+            GameData game = getGame(resign.getGameID());
+            AuthData auth = checkCredentials(resign.getAuthString());
+            ChessGame chessGame = game.game();
+            if (auth == null) {
+                manager.sendError(session, "ERROR: not authorized");
+                return;
+            }
+            if (game.game().getGameOverStatus()) {
+                manager.sendError(session, "ERROR: game is already over");
+                return;
+            }
+            if (game.whiteUsername() != null && game.whiteUsername().equals(auth.username())) {
+                chessGame.setGameOver();
+                chessGame.setWinner(ChessGame.TeamColor.WHITE);
+            } else if (game.blackUsername() != null && game.blackUsername().equals(auth.username())) {
+                chessGame.setGameOver();
+                chessGame.setWinner(ChessGame.TeamColor.BLACK);
+            } else {
+                manager.sendError(session, "ERROR: You can't resign if you're not a player.");
+                return;
+            }
+            data.getGameDAO().updateGame(chessGame, game.gameID());
+        }
+        catch(DataAccessException e){
+            manager.sendError(session, "ERROR: Unable to resign");
+        }
     }
 
     public void join(ConnectCommand command, Session session) throws IOException {
-        AuthData auth = checkCredentials(command.getAuthString());
-        if(auth == null){
-            manager.sendError(session, "ERROR: not authorized");
-            manager.sendMessage(session, "ERROR: not authorized");
-            return;
-        }
-        GameDAO gameDAO = data.getGameDAO();
-        GameData game = new GameData(null, null, null, null, new ChessGame());
-        //does the game exist?
-        boolean gameReal = gameDAO.verifyGame(command.getGameID());
-        if(!gameReal){
-            manager.sendError(session, "ERROR: game does not exist");
-            manager.sendMessage(session, "ERROR: game does not exist");
-            return;
-        }
-        //find the game because i didn't make a separate function...
-        Collection<GameData> games = gameDAO.listGames();
-        for(GameData tempGame: games){
-            if(tempGame.gameID() == command.getGameID()){
-                game = tempGame;
-                break;
+        try {
+            AuthData auth = checkCredentials(command.getAuthString());
+            if (auth == null) {
+                manager.sendError(session, "ERROR: not authorized");
+                return;
             }
+            GameDAO gameDAO = data.getGameDAO();
+            GameData game = new GameData(null, null, null, null, new ChessGame());
+            //does the game exist?
+            boolean gameReal = gameDAO.verifyGame(command.getGameID());
+            if (!gameReal) {
+                manager.sendError(session, "Error: game does not exist");
+                manager.removeSession(command.getGameID(), session);
+                return;
+            }
+            //find the game because i didn't make a separate function...
+            game = getGame(command.getGameID());
+//            Collection<GameData> games = gameDAO.listGames();
+//            for (GameData tempGame : games) {
+//                if (tempGame.gameID() == command.getGameID()) {
+//                    game = tempGame;
+//                    break;
+//                }
+//            }
+            manager.addSession(command.getGameID(), session);
+            LoadGameM loaded = new LoadGameM(game.game(), null);
+            String loadGameJson = json.toJson(loaded);
+            manager.sendMessage(session, loadGameJson);
+            String temp = auth.username();
+            if (command.getPlayerColor() == null) {
+                temp += " has joined as an observer.";
+            } else if (command.getPlayerColor().equals(ChessGame.TeamColor.WHITE)) {
+                temp += " has joined as white.";
+            } else if (command.getPlayerColor().equals(ChessGame.TeamColor.BLACK)) {
+                temp += " has joined as black.";
+            }
+            NotificationM notify = new NotificationM(temp);
+            String notifyJson = json.toJson(notify);
+            manager.broadcast(notifyJson, game.gameID(), session);
         }
-        //if spot is not open?
-//        if(command.getPlayerColor() == null){
-//        }
-//        else if(command.getPlayerColor() == ChessGame.TeamColor.WHITE && game.whiteUsername() != null){
-//            manager.sendError(session, "ERROR: white spot is taken already");
-//            manager.sendMessage(session, "ERROR: white spot is taken already");
-//            return;
-//        }
-//        else if(command.getPlayerColor() == ChessGame.TeamColor.BLACK && game.blackUsername() != null){
-//            manager.sendError(session, "ERROR: black spot is taken already");
-//            manager.sendMessage(session, "ERROR: black spot is taken already");
-//            return;
-//        }
-        manager.addSession(command.getGameID(), session);
-        LoadGameM loaded = new LoadGameM(game.game(),"Welcome to " + game.gameName() + "!");
-        String loadGameJson = json.toJson(loaded);
-        manager.sendMessage(session, loadGameJson);
-        String temp = auth.username();
-        if(command.getPlayerColor() == null){
-            temp += " has joined as an observer.";
+        catch(IOException e){
+            manager.sendError(session, "ERROR: unable to join");
+            manager.removeSession(command.getGameID(), session);
         }
-        else if(command.getPlayerColor().equals(ChessGame.TeamColor.WHITE)){
-            temp += " has joined as white.";
-        }
-        else if (command.getPlayerColor().equals(ChessGame.TeamColor.BLACK)){
-            temp += " has joined as black.";
-        }
-        NotificationM notify = new NotificationM(temp);
-        String notifyJson = json.toJson(notify);
-        manager.broadcast(notifyJson, game.gameID(), session);
+
     }
 
     public AuthData checkCredentials(String auth){
@@ -249,6 +258,16 @@ public class WebsocketHandler {
         String userName = authDAO.getUsername(auth);
         authData = authDAO.getAuth(userName);
         return authData;
+    }
+
+    public GameData getGame(int gameID){
+        GameData gameData = null;
+        for (GameData currentGame : data.getGameDAO().listGames()) {
+            if(currentGame.gameID() ==  gameID) {
+                gameData = currentGame;
+            }
+        }
+        return gameData;
     }
 
 }

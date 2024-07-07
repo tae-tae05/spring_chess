@@ -76,14 +76,24 @@ public class MySQLAuthDAO implements AuthDAO {
         }
     }
 
+
+
     @Override
     public AuthData getAuth(String username) {
+        if(username == null){
+            return null;
+        }
         String sql = "SELECT authToken, username FROM auth WHERE username= '" + username + "'";
         try (var connection = DatabaseManager.getConnection()){
             var pst = connection.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
-            rs.next();
-            return new AuthData(rs.getString("authToken"), rs.getString("username"));
+            if(rs.next()){
+                return new AuthData(rs.getString("authToken"), rs.getString("username"));
+            }
+            else{
+//                throw new DataAccessException("Error: does not exist");
+                return null;
+            }
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
@@ -95,8 +105,13 @@ public class MySQLAuthDAO implements AuthDAO {
         try (var connection = DatabaseManager.getConnection()){
             var pst = connection.prepareStatement(sql);
             ResultSet rs = pst.executeQuery();
-            rs.next();
-            return rs.getString("username");
+            if(rs.next()){
+                return rs.getString("username");
+            }
+            else{
+//                throw new DataAccessException("Error: does not exist");
+                return null;
+            }
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }

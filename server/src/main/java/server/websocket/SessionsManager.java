@@ -34,8 +34,8 @@ public class SessionsManager {
             session.getRemote().sendString(message);
         }
     }
-    public void sendError(Session session, String message) throws IOException {
-        ErrorM error = new ErrorM(message);
+    public void sendError(Session session, String errorMessage) throws IOException {
+        ErrorM error = new ErrorM(errorMessage);
         sendMessage(session, new Gson().toJson(error));
     }
 
