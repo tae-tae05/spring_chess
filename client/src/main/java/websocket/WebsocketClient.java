@@ -41,12 +41,6 @@ public class WebsocketClient extends Endpoint {
         }
     }
 
-    public void onOpen(Session session, EndpointConfig endpointConfig){
-    }
-    public void send(String msg) throws Exception {
-        this.session.getBasicRemote().sendText(msg);
-    }
-
     public void connect(String authToken, ChessGame.TeamColor teamColor, int gameID) throws ServerException {
         try{
             var action = new ConnectCommand(authToken, gameID, teamColor);
@@ -87,4 +81,7 @@ public class WebsocketClient extends Endpoint {
         }
     }
 
+    @Override
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
+    }
 }

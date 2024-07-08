@@ -19,30 +19,7 @@ public class RookMoves implements MovesCalculator {
     }
 
     public Collection<ChessMove> rookMoves(int row, int col, int p, int j, ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor current){
-        Collection<ChessMove> moves = new ArrayList<>();
-        for(int i = 1; i < 9; i++){
-            int b = p * i;
-            int c = j * i;
-            if(isValid(row+b, col+c)){
-                ChessPosition next = new ChessPosition(row+b, col+c);
-                if(board.getPiece(next) == null){
-                    ChessMove rookMove = new ChessMove(myPosition, next, null);
-                    moves.add(rookMove);
-                }
-                else if(board.getPiece(next) != null) {
-                    if (board.getPiece(next).getTeamColor() == current) {
-                        break;
-                    }
-                    ChessMove rookMove = new ChessMove(myPosition, next, null);
-                    moves.add(rookMove);
-                    break;
-                }
-            }
-            else{
-                break;
-            }
-        }
-        return moves;
+        return board.findMoves(row, col, p, j, board, myPosition, current);
     }
     @Override
     public Boolean isValid(int row, int col) {

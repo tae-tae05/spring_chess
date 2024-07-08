@@ -284,12 +284,6 @@ public class Repl implements NotifHandler {
         ChessGame game = message.getGame();
         //redraw board here?
         PrintingChessBoard print = new PrintingChessBoard();
-//        if(game.getTeamTurn() == ChessGame.TeamColor.WHITE) {
-//            print.printWhite(game);
-//        }
-//        else{
-//            print.printBlack(game);
-//        }
         runGame.redraw(message.getGame());
     }
 

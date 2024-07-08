@@ -22,30 +22,7 @@ public class BishopMoves implements MovesCalculator {
     }
 
     public Collection<ChessMove> bishopMoves(int row, int col, int t, int y, ChessBoard board, ChessPosition position, ChessGame.TeamColor current){
-        Collection<ChessMove> moves = new ArrayList<>();
-        for(int i = 1; i < 9; i++){
-            int a = t * i;
-            int b = y * i;
-            if(isValid(row+a, col+b)){
-                ChessPosition next = new ChessPosition(row+a, col+b);
-                if(board.getPiece(next) == null){
-                    ChessMove bishopMove = new ChessMove(position, next, null);
-                    moves.add(bishopMove);
-                }
-                else if(board.getPiece(next) != null) {
-                    if (board.getPiece(next).getTeamColor() == current) {
-                        break;
-                    }
-                    ChessMove bishopMove = new ChessMove(position, next, null);
-                    moves.add(bishopMove);
-                    break;
-                }
-            }
-            else{
-                break;
-            }
-        }
-        return moves;
+        return board.findMoves(row, col, t, y, board, position, current);
     }
 
     @Override

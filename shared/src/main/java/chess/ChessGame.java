@@ -15,10 +15,11 @@ public class ChessGame {
     private TeamColor turn = TeamColor.WHITE;
 
     private TeamColor winner = null;
-    private boolean gameOver = false;
+    private boolean gameOver;
     private ChessBoard board = new ChessBoard();
     public ChessGame() {
         board.resetBoard();
+        gameOver = false;
     }
     /**
      * @return Which team's turn it is

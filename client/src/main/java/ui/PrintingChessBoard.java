@@ -107,22 +107,6 @@ public class PrintingChessBoard {
         System.out.println();
     }
 
-//    public void printHelper(int row, int col, ChessGame game, ChessGame.TeamColor turnColor){
-//        String backgroundColor;
-//        if ((row + col) % 2 != 0) {
-//            backgroundColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
-//        } else {
-//            backgroundColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
-//        }
-//        ChessPiece piece = game.getBoard().getPiece(new ChessPosition(row, col));
-//        if (piece == null) {
-//            System.out.print(backgroundColor + EscapeSequences.EMPTY + EscapeSequences.RESET_BG_COLOR);
-//        }
-//        else{
-//            printPiece(piece, turnColor, backgroundColor);
-//        }
-//    }
-
     public void printHelper(int row, int col, ChessGame game, ChessGame.TeamColor turnColor, boolean highlight, ChessPosition startPosition){
         String backgroundColor = "";
         if(startPosition != null && startPosition.getRow() == row && startPosition.getColumn() == col){

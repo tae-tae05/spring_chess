@@ -83,38 +83,28 @@ public class WebsocketHandler {
             NotificationM notify = new NotificationM(message);
             String notifyJson = json.toJson(notify);
             manager.broadcast(notifyJson, game.gameID(), session);
+            //check if making move has ended the game
+            if(newGame.isInStalemate(myColor)){
+                gameStatusUpdate("You are now in stalemate. The game is over!", game.gameID(), session, opponentColor, myColor);
+                newGame.setGameOver();
+            }
+            if(newGame.isInCheckmate(opponentColor)){
+                newGame.setGameOver();
+                String m = auth.username() + " is in checkmate. Game over!";
+                gameStatusUpdate(m, game.gameID(), session, opponentColor, myColor);
+            }
+            else if(newGame.isInCheck(opponentColor)){
+                String m = opponentColor + " is in check.";
+                gameStatusUpdate(m, game.gameID(), session, opponentColor, myColor);
+            }
+            else {
+                newGame.setTeamTurn(opponentColor);
+            }
             LoadGameM load = new LoadGameM(game.game(), null);
             notifyJson = json.toJson(load);
             manager.sendMessage(session, notifyJson);
             manager.broadcast(notifyJson, game.gameID(), session);
-            //check if making move has ended the game
-            if(newGame.isInStalemate(myColor)){
-                gameStatusUpdate("You are now in stalemate. The game is over!", game.gameID(), session, opponentColor, myColor);
-//                notify = new NotificationM("You are now in stalemate. The game is over!");
-//                notifyJson = json.toJson(notify);
-//                manager.sendMessage(session, notifyJson);
-//                manager.broadcast(notifyJson, game.gameID(), session);
-            }
-            if(newGame.isInCheckmate(opponentColor)){
-                String m = opponentColor + " is in checkmate. " +  myColor + " has won the game!";
-                gameStatusUpdate(m, game.gameID(), session, opponentColor, myColor);
-//                notify = new NotificationM(m);
-//                notifyJson = json.toJson(notify);
-//                manager.sendMessage(session, notifyJson);
-//                manager.broadcast(notifyJson, game.gameID(), session);
-                newGame.setGameOver();
-            }
-            else if(newGame.isInCheckmate(opponentColor)){
-                String m = opponentColor + " is in check.";
-                gameStatusUpdate(m, game.gameID(), session, opponentColor, myColor);
-//                notify = new NotificationM(m);
-//                notifyJson = json.toJson(notify);
-//                manager.sendMessage(session, notifyJson);
-//                manager.broadcast(notifyJson, game.gameID(), session);
-            }
-            newGame.setTeamTurn(opponentColor);
-            game = game.setGame(newGame);
-            data.getGameDAO().updateGame(game.game(), game.gameID());
+            data.getGameDAO().updateGame(newGame, game.gameID());
         } catch (IOException | DataAccessException | InvalidMoveException e) {
             manager.sendError(session, "Error: invalid move");
             throw new RuntimeException(e);
@@ -222,13 +212,6 @@ public class WebsocketHandler {
             }
             //find the game because i didn't make a separate function...
             game = getGame(command.getGameID());
-//            Collection<GameData> games = gameDAO.listGames();
-//            for (GameData tempGame : games) {
-//                if (tempGame.gameID() == command.getGameID()) {
-//                    game = tempGame;
-//                    break;
-//                }
-//            }
             manager.addSession(command.getGameID(), session);
             LoadGameM loaded = new LoadGameM(game.game(), null);
             String loadGameJson = json.toJson(loaded);

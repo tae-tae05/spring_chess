@@ -1,14 +1,10 @@
 package server;
-import org.eclipse.jetty.websocket.api.Session;
 
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.DatabaseManager;
-import dataaccess.memory.MemoryDataAccess;
 import dataaccess.sql.MySQLDataAccess;
 import handlers.*;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import server.websocket.WebsocketHandler;
 import service.GameService;
 import spark.*;

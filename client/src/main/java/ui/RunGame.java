@@ -143,6 +143,10 @@ public class RunGame {
     }
 
     public void highlight(){
+        if(game.getGameOverStatus()){
+            System.out.println("Game over. No moves to check");
+            return;
+        }
         System.out.println("What piece would you like to check?");
         int row;
         int col;
@@ -169,6 +173,7 @@ public class RunGame {
             System.out.println("You're an observer. You can't make moves, so just sit and watch.");
             return;
         }
+        System.out.println(game.getGameOverStatus());
         if(game.getGameOverStatus()){
             System.out.println("game over. you can't make more moves");
             return;
@@ -182,28 +187,6 @@ public class RunGame {
 
         ChessPosition startPosition = getStartPosition();
         ChessPiece piece = game.getBoard().getPiece(startPosition);
-
-//        System.out.println("What piece would you like to move?");
-//        int row = getRow();
-//        int col = getCol();
-//        ChessPosition startPosition = new ChessPosition(row, col);
-//        ChessPiece piece = board.getPiece(startPosition);
-//
-//        while(piece.getTeamColor() != myColor){
-//            System.out.println("That's not your piece. Try again.");
-//            row = getRow();
-//            col = getCol();
-//            startPosition = new ChessPosition(row, col);
-//            piece = board.getPiece(startPosition);
-//        }
-//
-//        while(game.validMoves(startPosition).isEmpty() || piece == null){
-//            System.out.println("You can't move that piece. Try again, what piece would you like to move?");
-//            row = getRow();
-//            col = getCol();
-//            startPosition = new ChessPosition(row, col);
-//            piece = board.getPiece(startPosition);
-//        }
 
         System.out.println("Where would you like to move it to?");
         int newRow = getRow();

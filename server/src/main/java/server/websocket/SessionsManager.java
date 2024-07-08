@@ -25,10 +25,6 @@ public class SessionsManager {
             allSessions.get(gameId).remove(session);
         }
     }
-    public Map<Integer, Set<Session>> getSessions(){
-        return allSessions;
-    }
-
     public void sendMessage(Session session, String message) throws IOException {
         if (session.isOpen()) {
             session.getRemote().sendString(message);
@@ -45,9 +41,6 @@ public class SessionsManager {
                 sendMessage(session, message);
             }
         }
-    }
-    public void empty(){
-        allSessions.clear();
     }
 
 }
