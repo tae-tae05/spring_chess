@@ -173,7 +173,6 @@ public class RunGame {
             System.out.println("You're an observer. You can't make moves, so just sit and watch.");
             return;
         }
-        System.out.println(game.getGameOverStatus());
         if(game.getGameOverStatus()){
             System.out.println("game over. you can't make more moves");
             return;
